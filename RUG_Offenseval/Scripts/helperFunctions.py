@@ -1,12 +1,15 @@
 
 import re
+import random
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 from random import shuffle
 
-def read_corpus_otherSet(corpus_file, binary=True):
+
+
+def read_corpus_otherSet(corpus_file, binary=True): #Facebook Enlgish
     '''Reading in data from corpus file'''
     with open(corpus_file, 'r', encoding='utf-8') as fi:
         fi = fi.readlines()
@@ -62,11 +65,10 @@ def read_corpus_WaseemHovy(corpus_file):
             else:
                 labels.append('OFF')
     mapIndexPosition = list(zip(ids, tweets, labels))
+    random.seed(1337)
     shuffle(mapIndexPosition)
     ids, tweets, labels = zip(*mapIndexPosition)
-    #print(ids[1:20])
-    #print(tweets[1:20])
-    #print(labels[1:20])
+
     return ids, tweets, labels
 
 def read_corpus(corpus_file, binary=True):
@@ -82,14 +84,14 @@ def read_corpus(corpus_file, binary=True):
                 raise IndexError('Missing data for tweet "%s"' % data[0])
 
             ids.append(data[0])
-
-
             tweets.append(data[1])
-            labels.append(data[2])
-    #print(ids[1:20])
-    #print(tweets[1:20])
-    #print(labels[1:20])
-    return ids[1:], tweets[1:], labels[1:]
+
+            if data[2] == '1':
+                labels.append('OFF')
+            elif data[2] == '0':
+                labels.append('NOT')
+
+    return ids[1:], tweets[1:], labels
 
 def load_embeddings(embedding_file):
     '''

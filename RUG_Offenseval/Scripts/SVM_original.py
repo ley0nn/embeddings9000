@@ -6,17 +6,19 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 source = 'Twitter'      ## options: Twitter, Reddit
 dataSet = 'other'
 # dataSet = 'WaseemHovy'
+# dataSet = 'standard'
 
-offensiveRatio = 1/3
-nonOffensiveRatio = 2/3
+# offensiveRatio = 1/3
+# nonOffensiveRatio = 2/3
 
 trainPath = '../../english/agr_en_train.csv'
-# trainPath = '../../Full_Tweets_June2016_Dataset.csv'
+# trainPath = '../../Full_Tweets_June2016_Dataset.csv'      # WaseemHovy
+# trainPath = '../../public_development_en/train_en.tsv'      # SemEval
 
-# path_to_embs = '../../embeddings/reddit_general.txt'
+path_to_embs = '../../embeddings/reddit_general.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
+# path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
 
 #########################################################
 
@@ -63,11 +65,15 @@ if __name__ == '__main__':
             IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_WaseemHovy(trainPath)
         else:
             IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_WaseemHovy(trainPath)
+    elif dataSet == 'standard':
+        IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus(trainPath)
     else:
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_otherSet(trainPath)
         ## TODO: implement reading function for the Reddit data
 
 
+    offensiveRatio = Ytrain.count('OFF')/len(Ytrain)
+    nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
 
     # Minimal preprocessing / cleaning
     Xtrain = helperFunctions.clean_samples(Xtrain)
