@@ -12,7 +12,7 @@ dataSet = 'wikimedia'
 # offensiveRatio = 1/3
 # nonOffensiveRatio = 2/3
 
-trainPath = '../../english/agr_en_train.csv'
+# trainPath = '../../english/agr_en_train.csv'
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'      # WaseemHovy
 # trainPath = '../../public_development_en/train_en.tsv'      # SemEval
 trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments

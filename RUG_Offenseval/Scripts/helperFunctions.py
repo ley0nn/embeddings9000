@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 from random import shuffle
+import pandas as pd
 
 
 
@@ -96,52 +97,23 @@ def read_corpus(corpus_file, binary=True):
 
 def read_corpus_wikimedia(corpus_file, binary=True):
     '''Reading in data from corpus file'''
+    label_dict = {True: 'OFF', False: 'NOT'}
 
-    ids_dict = {'score': 0}
-    labels_file = '../../4563973/toxicity_annotations.tsv'
-    with open(labels_file, 'r', encoding='utf-8') as fi:
-        next(fi)
-
-        for line in fi:
-            ids_dict[line[0]] = {'score': ""}
-            tmp = 0
-            count = 0
-
-            if i != line[0]:
-                continue
-            tmp += i[3]
-            count += 1
-            score = tmp/count
-            if score > 0.5:
-                labels.append('OFF')
-            else:
-                labels.append('NOT')
-
-            ids_dict[line[0]] = line[3]
-
-
-
-    documents = []
-
-    ids = []
-    tweets = []
-    labels = []
-
-    with open(corpus_file, 'r', encoding='utf-8') as fi:
-        for line in fi:
-            tmp = 0
-            count = 0
-            # strip NEWLINE
-            for i in annotations:
-                if i != line[0]:
-                    continue
-                tmp += i[3]
-                count += 1
-            score = tmp/count
-            if score > 0.5:
-                labels.append('OFF')
-            else:
-                labels.append('NOT')
+    comments = pd.read_csv(corpus_file, sep = '\t')
+    ids = list(comments['rev_id'])
+    comments = pd.read_csv(corpus_file, sep = '\t', index_col = 0)
+    annotations = pd.read_csv('../../4563973/toxicity_annotations.tsv',  sep = '\t')
+    # len(annotations['rev_id'].unique())
+    # labels a comment as an atack if the majority of annoatators did so
+    labels = annotations.groupby('rev_id')['toxicity_score'].mean() > 0.5
+    # join labels and comments
+    comments['toxicity_score'] = labels
+    # remove newline and tab tokens
+    comments['comment'] = comments['comment'].apply(lambda x: x.replace("NEWLINE_TOKEN", " "))
+    comments['comment'] = comments['comment'].apply(lambda x: x.replace("TAB_TOKEN", " "))
+    comments['toxicity_score'] = comments['toxicity_score'].map(label_dict)
+    tweets = list(comments['comment'])
+    labels = list(comments['toxicity_score'])
 
     return ids, tweets, labels
 
@@ -160,7 +132,7 @@ def load_embeddings(embedding_file):
     if embedding_file.endswith('.txt'):
         w2v = {}
         vocab = []
-        f = open(embedding_file,'rb')
+        f = open(embedding_file,'r')
         for line in f:
             values = line.split()
             word = values[0]
