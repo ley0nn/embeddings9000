@@ -13,10 +13,10 @@ nonOffensiveRatio = 2/3
 trainPath = '../../english/agr_en_train.csv'
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'
 
-path_to_embs = '../../embeddings/reddit_general.txt'
+# path_to_embs = '../../embeddings/reddit_general.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-# path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
+path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
 
 #########################################################
 
@@ -97,6 +97,7 @@ if __name__ == '__main__':
     print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
     embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
     print('Done')
+    exit()
 
     vectorizer = FeatureUnion([('word', count_word),
                                 ('char', count_char),
@@ -126,7 +127,7 @@ if __name__ == '__main__':
     '''
 
     print("10-fold cross validation results:")
-    print(cross_validate(classifier, Xtrain, Ytrain,cv=10))
+    # print(cross_validate(classifier, Xtrain, Ytrain,cv=10))
     print('Done.')
 
 

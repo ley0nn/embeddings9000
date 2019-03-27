@@ -102,7 +102,7 @@ def load_embeddings(embedding_file):
     if embedding_file.endswith('.txt'):
         w2v = {}
         vocab = []
-        f = open(embedding_file,'r')
+        f = open(embedding_file,'rb')
         for line in f:
             values = line.split()
             word = values[0]
@@ -115,20 +115,8 @@ def load_embeddings(embedding_file):
             vocab.append(word)
         print ("Done.",len(w2v)," words loaded!")
         return w2v, vocab
-        # f.close()
-    elif embedding_file.endswith('200d.txt'):
-        print ("Loading Glove Model")
-        f = open(embedding_file,'r')
-        model = {}
-        vocab = []
-        for line in f:
-            splitLine = line.split()
-            word = splitLine[0]
-            embedding = np.array([float(val) for val in splitLine[1:]])
-            model[word] = embedding
-            vocab.append(word)
-        print ("Done.",len(model)," words loaded!")
-        return model, vocab
+        f.close()
+
 
 
 def clean_samples(samples):
