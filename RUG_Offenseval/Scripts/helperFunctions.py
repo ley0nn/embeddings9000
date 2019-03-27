@@ -93,6 +93,62 @@ def read_corpus(corpus_file, binary=True):
 
     return ids[1:], tweets[1:], labels
 
+
+def read_corpus_wikimedia(corpus_file, binary=True):
+    '''Reading in data from corpus file'''
+
+    ids_dict = {'score': 0}
+    labels_file = '../../4563973/toxicity_annotations.tsv'
+    with open(labels_file, 'r', encoding='utf-8') as fi:
+        next(fi)
+
+        for line in fi:
+            ids_dict[line[0]] = {'score': ""}
+            tmp = 0
+            count = 0
+
+            if i != line[0]:
+                continue
+            tmp += i[3]
+            count += 1
+            score = tmp/count
+            if score > 0.5:
+                labels.append('OFF')
+            else:
+                labels.append('NOT')
+
+            ids_dict[line[0]] = line[3]
+
+
+
+    documents = []
+
+    ids = []
+    tweets = []
+    labels = []
+
+    with open(corpus_file, 'r', encoding='utf-8') as fi:
+        for line in fi:
+            tmp = 0
+            count = 0
+            # strip NEWLINE
+            for i in annotations:
+                if i != line[0]:
+                    continue
+                tmp += i[3]
+                count += 1
+            score = tmp/count
+            if score > 0.5:
+                labels.append('OFF')
+            else:
+                labels.append('NOT')
+
+    return ids, tweets, labels
+
+
+
+
+
 def load_embeddings(embedding_file):
     '''
     loading embeddings from file

@@ -4,9 +4,10 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 '''
 #### PARAMS #############################################
 source = 'Twitter'      ## options: Twitter, Reddit
-dataSet = 'other'
+# dataSet = 'other'
 # dataSet = 'WaseemHovy'
 # dataSet = 'standard'
+dataSet = 'wikimedia'
 
 # offensiveRatio = 1/3
 # nonOffensiveRatio = 2/3
@@ -14,6 +15,7 @@ dataSet = 'other'
 trainPath = '../../english/agr_en_train.csv'
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'      # WaseemHovy
 # trainPath = '../../public_development_en/train_en.tsv'      # SemEval
+trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
 path_to_embs = '../../embeddings/reddit_general.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
@@ -67,6 +69,8 @@ if __name__ == '__main__':
             IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_WaseemHovy(trainPath)
     elif dataSet == 'standard':
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus(trainPath)
+    elif dataSet == 'wikimedia':
+        IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_wikimedia(trainPath)
     else:
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_otherSet(trainPath)
         ## TODO: implement reading function for the Reddit data
