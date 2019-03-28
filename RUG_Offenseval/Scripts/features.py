@@ -39,8 +39,12 @@ class Embeddings(TransformerMixin):
         '''
         Obtains sentence embedding representing a whole sentence / tweet
         '''
+        # firstword = sentence.split()[0]
+        # print(word_embeds.keys())
+        # exit()
+        
         # simply get dim of embeddings
-        l_vector = len(word_embeds['und'])
+        l_vector = len(word_embeds['a'])
 
         # replace each word in sentence with its embedding representation via look up in the embedding dict strcuture
         # if no word_embedding available for a word, just ignore the word
