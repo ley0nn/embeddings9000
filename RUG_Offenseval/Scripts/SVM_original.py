@@ -4,10 +4,17 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 '''
 #### PARAMS #############################################
 source = 'Twitter'      ## options: Twitter, Reddit
+
 # dataSet = 'other'
 # dataSet = 'WaseemHovy'
-dataSet = 'standard'
+# dataSet = 'standard'
 # dataSet = 'wikimedia'
+
+# dataSet = 'other_waseem_standardVSwikimedia'
+# dataSet = 'other_waseem_wikimediaVSstandard'
+# dataSet = 'other_standard_wikimediaVSwaseem'
+dataSet = 'waseem_standard_wikimediaVSother'
+# dataSet = 'waseem_standard_wikimedia_otherVSstackoverflow'
 
 # ftr = 'ngram'
 ftr = 'embeddings'
@@ -20,10 +27,10 @@ evlt = 'traintest'
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
-trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
+# trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
-testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
+# testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 
 # path_to_embs = '../../embeddings/reddit_general.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
@@ -71,6 +78,9 @@ if __name__ == '__main__':
 
 
     print('Reading in ' + source + ' training data...' + dataSet)
+    IDsTrain = []
+    Xtrain = []
+    Ytrain = []
     if dataSet == 'WaseemHovy':
         if TASK == 'binary':
             IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_WaseemHovy(trainPath)
@@ -79,6 +89,96 @@ if __name__ == '__main__':
     elif dataSet == 'standard':
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus(trainPath)
         IDsTest,Xtest,Ytest = helperFunctions.read_corpus(testPath)
+    elif dataSet == 'other_waseem_standardVSwikimedia':
+        IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
+        for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsStandard,Xstandard,Ystandard = helperFunctions.read_corpus('../../public_development_en/train_en.tsv')
+        for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = helperFunctions.read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv')
+        IDsOther,Xother,Yother = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
+        for id,x,y in zip(IDsOther,Xother,Yother):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+    elif dataSet == 'other_waseem_wikimediaVSstandard':
+        IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
+        for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = helperFunctions.read_corpus('../../public_development_en/train_en.tsv')
+        IDsWikimedia,Xwikimedia,Ywikimedia = helperFunctions.read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv')
+        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsOther,Xother,Yother = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
+        for id,x,y in zip(IDsOther,Xother,Yother):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+    elif dataSet == 'other_standard_wikimediaVSwaseem':
+        IDsTest,Xtest,Ytest = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
+        IDsStandard,Xstandard,Ystandard = helperFunctions.read_corpus('../../public_development_en/train_en.tsv')
+        for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsWikimedia,Xwikimedia,Ywikimedia = helperFunctions.read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv')
+        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsOther,Xother,Yother = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
+        for id,x,y in zip(IDsOther,Xother,Yother):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+    elif dataSet == 'waseem_standard_wikimediaVSother':
+        IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
+        for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsStandard,Xstandard,Ystandard = helperFunctions.read_corpus('../../public_development_en/train_en.tsv')
+        for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsWikimedia,Xwikimedia,Ywikimedia = helperFunctions.read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv')
+        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
+    # elif dataSet == 'waseem_standard_wikimedia_otherVSstackoverflow':
+    #     IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
+    #     for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsStandard,Xstandard,Ystandard = helperFunctions.read_corpus('../../public_development_en/train_en.tsv')
+    #     for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsOther,Xother,Yother = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
+    #     for id,x,y in zip(IDsOther,Xother,Yother):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsWikimedia,Xwikimedia,Ywikimedia = helperFunctions.read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv')
+    #     for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsTest,Xtest,Ytest = helperFunctions.read_corpus_stackoverflow('...')
     elif dataSet == 'wikimedia':
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_wikimedia(trainPath)
     else:
