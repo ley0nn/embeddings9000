@@ -271,19 +271,12 @@ if __name__ == '__main__':
         vectorizer = FeatureUnion([ ('word', count_word),
                                     ('char', count_char)])
 
-
     elif ftr == 'embeddings':
-        # count_word = CountVectorizer(tokenizer=tokenizer)
-        count_word = CountVectorizer()
-        # Getting embeddings
-
-        # path_to_embs = 'embeddings/model_reset_random.bin'
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         print('Done')
         vectorizer = features.Embeddings(embeddings, pool='max')
-        # vectorizer = FeatureUnion([ ('word', count_word),
-        #                             ('word_embeds', features.Embeddings(embeddings, pool='max'))])
+
     elif ftr == 'embeddings+ngram':
         count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
         count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
