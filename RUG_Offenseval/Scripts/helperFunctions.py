@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 from random import shuffle
 import pandas as pd
+import os
 
 
 
@@ -171,19 +172,32 @@ def clean_samples(samples):
     new_samples = []
     for tw in samples:
 
-        tw = re.sub(r'@\S+','User', tw)
-        tw = re.sub(r'\|LBR\|', '', tw)
-        tw = re.sub(r'http\S+\s?', '', tw)
-        tw = re.sub(r'\#', '', tw)
-        new_samples.append(tw)
-
-        # tw = re.sub(r'@\S+','<USER>', tw)
+        # tw = re.sub(r'@\S+','User', tw)
         # tw = re.sub(r'\|LBR\|', '', tw)
-        # tw = re.sub(r'http\S+\s?', '<URL>', tw)
-        # tw = re.sub(r'\#', '<HASHTAG>', tw)
+        # tw = re.sub(r'http\S+\s?', '', tw)
+        # tw = re.sub(r'\#', '', tw)
+        # new_samples.append(tw)
+
+        tw = re.sub(r'@\S+','<user>', tw)
+        tw = re.sub(r'\|LBR\|', '', tw)
+        tw = re.sub(r'http\S+\s?', '<url>', tw)
+        tw = re.sub(r'\#', '<hashtag>', tw)
+        new_samples.append(tw)
 
     return new_samples
 
+def clean_samples_ruby(samples):
+    with open('tmp_file.txt', 'w') as tmp_file:
+         for line in samples:
+             tmp_file.write(line + '\n')
+
+    clean = os.popen('ruby -n preprocess-twitter.rb tmp_file.txt').read().split('\n')
+    new_samples = []
+    for line in clean:
+        if not line:
+            continue
+        new_samples.append(line)
+    return new_samples
 
 def load_offense_words(path):
     ow = []

@@ -7,30 +7,34 @@ source = 'Twitter'      ## options: Twitter, Reddit
 
 # dataSet = 'other'
 # dataSet = 'WaseemHovy'
-# dataSet = 'standard'
+dataSet = 'standard'
 # dataSet = 'wikimedia'
 
 # dataSet = 'other_waseem_standardVSwikimedia'
 # dataSet = 'other_waseem_wikimediaVSstandard'
 # dataSet = 'other_standard_wikimediaVSwaseem'
-dataSet = 'waseem_standard_wikimediaVSother'
+# dataSet = 'waseem_standard_wikimediaVSother'
 # dataSet = 'waseem_standard_wikimedia_otherVSstackoverflow'
+# dataSet = 'waseem_standard_wikimedia_otherVSstandardTest_otherTest'
 
 # ftr = 'ngram'
-ftr = 'embeddings'
+# ftr = 'embeddings'
+ftr = 'embeddings+ngram'
 
-# evlt = 'cv10'
-evlt = 'traintest'
+evlt = 'cv10'
+# evlt = 'traintest'
 
-# offensiveRatio = 1/3
-# nonOffensiveRatio = 2/3
+# clean = 'std'
+clean = 'ruby'
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
-# trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
+trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
+testPath = ""
 # testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
+# testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
 
 # path_to_embs = '../../embeddings/reddit_general.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
@@ -48,6 +52,7 @@ import stop_words
 import json
 import pickle
 import gensim.models as gm
+import os
 
 import features
 from sklearn.base import TransformerMixin
@@ -81,6 +86,9 @@ if __name__ == '__main__':
     IDsTrain = []
     Xtrain = []
     Ytrain = []
+    IDsTest = []
+    Xtest = []
+    Ytest = []
     if dataSet == 'WaseemHovy':
         if TASK == 'binary':
             IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_WaseemHovy(trainPath)
@@ -88,7 +96,8 @@ if __name__ == '__main__':
             IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus_WaseemHovy(trainPath)
     elif dataSet == 'standard':
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus(trainPath)
-        IDsTest,Xtest,Ytest = helperFunctions.read_corpus(testPath)
+        if testPath == '../../public_development_en/dev_en.tsv':
+            IDsTest,Xtest,Ytest = helperFunctions.read_corpus(testPath)
     elif dataSet == 'other_waseem_standardVSwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
@@ -157,6 +166,23 @@ if __name__ == '__main__':
             Xtrain.append(x)
             Ytrain.append(y)
         IDsTest,Xtest,Ytest = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
+    elif dataSet == 'waseem_standard_wikimedia_otherVSstandardTest_otherTest':
+        IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
+        for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsStandard,Xstandard,Ystandard = helperFunctions.read_corpus('../../public_development_en/train_en.tsv')
+        for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsWikimedia,Xwikimedia,Ywikimedia = helperFunctions.read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv')
+        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = helperFunctions.read_corpus_otherSet('../../english/agr_en_train.csv')
     # elif dataSet == 'waseem_standard_wikimedia_otherVSstackoverflow':
     #     IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv')
     #     for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
@@ -190,7 +216,12 @@ if __name__ == '__main__':
     nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
 
     # Minimal preprocessing / cleaning
-    Xtrain = helperFunctions.clean_samples(Xtrain)
+    if clean == 'std':
+        Xtrain = helperFunctions.clean_samples(Xtrain)
+    if clean == 'ruby':
+        Xtrain = helperFunctions.clean_samples_ruby(Xtrain)
+        if testPath != "":
+            Xtest = helperFunctions.clean_samples_ruby(Xtest)
 
     print(len(Xtrain), 'training samples!')
     '''
@@ -226,6 +257,15 @@ if __name__ == '__main__':
 
         vectorizer = FeatureUnion([('word', count_word),
                                     ('word_embeds', features.Embeddings(embeddings, pool='max'))])
+    elif ftr == 'embeddings+ngram':
+        count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
+        count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
+        # path_to_embs = 'embeddings/model_reset_random.bin'
+        print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
+        embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
+        print('Done')
+        vectorizer = FeatureUnion([('word', count_word),
+                                    ('char', count_char),('word_embeds', features.Embeddings(embeddings, pool='max'))])
 
 
     # Set up SVM classifier with unbalanced class weights
