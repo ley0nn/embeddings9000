@@ -4,6 +4,7 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 '''
 #### PARAMS #############################################
 source = 'Twitter'      ## options: Twitter, Reddit
+# source = 'Reddit'
 
 # dataSet = 'other'
 # dataSet = 'WaseemHovy'
@@ -24,22 +25,26 @@ ftr = 'embeddings+ngram'
 evlt = 'cv10'
 # evlt = 'traintest'
 
-# clean = 'std'
-clean = 'ruby'
+# clean = 'none'
+# clean = 'std'     # PPsmall
+clean = 'ruby'    # PPbig
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
 trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
-testPath = ""
+testPath = ''
 # testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
 
 # path_to_embs = '../../embeddings/reddit_general.txt'
+# path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
+# path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
 path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
 # path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
+
 
 #########################################################
 
@@ -56,7 +61,6 @@ import os
 
 import features
 from sklearn.base import TransformerMixin
-from nltk.tokenize import TweetTokenizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import KFold, cross_validate
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -69,8 +73,28 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 
-# from load_embeddings import open_embeddings
+from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
 
+MWET = MWETokenizer([   ('<', 'url', '>'),
+                        ('<', 'user', '>'),
+                        ('<', 'smile', '>'),
+                        ('<', 'lolface', '>'),
+                        ('<', 'sadface', '>'),
+                        ('<', 'neutralface', '>'),
+                        ('<', 'heart', '>'),
+                        ('<', 'number', '>'),
+                        ('<', 'hashtag', '>'),
+                        ('<', 'allcaps', '>'),
+                        ('<', 'repeat', '>'),
+                        ('<', 'elong', '>'),
+                    ], separator='')
+
+def ntlktokenizer(x):
+    tokens = word_tokenize(x)           # tokenize
+    tokens = MWET.tokenize(tokens)      # fix <url> and <user> etc.
+    print(tokens)
+
+    return ' '.join(tokens)
 
 if __name__ == '__main__':
 
@@ -216,11 +240,12 @@ if __name__ == '__main__':
     nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
 
     # Minimal preprocessing / cleaning
+
     if clean == 'std':
         Xtrain = helperFunctions.clean_samples(Xtrain)
     if clean == 'ruby':
         Xtrain = helperFunctions.clean_samples_ruby(Xtrain)
-        if testPath != "":
+        if testPath != '':
             Xtest = helperFunctions.clean_samples_ruby(Xtest)
 
     print(len(Xtrain), 'training samples!')
@@ -236,14 +261,16 @@ if __name__ == '__main__':
     if source == 'Twitter':
         tokenizer = TweetTokenizer().tokenize
     else:
-        tokenizer = None
+        # tokenizer = None
+        tokenizer = ntlktokenizer
         ### TODO: define tokenizer for Reddit data
 
     if ftr == 'ngram':
         count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
         count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
-        vectorizer = FeatureUnion([('word', count_word),
+        vectorizer = FeatureUnion([ ('word', count_word),
                                     ('char', count_char)])
+
 
     elif ftr == 'embeddings':
         # count_word = CountVectorizer(tokenizer=tokenizer)
@@ -254,9 +281,9 @@ if __name__ == '__main__':
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         print('Done')
-
-        vectorizer = FeatureUnion([('word', count_word),
-                                    ('word_embeds', features.Embeddings(embeddings, pool='max'))])
+        vectorizer = features.Embeddings(embeddings, pool='max')
+        # vectorizer = FeatureUnion([ ('word', count_word),
+        #                             ('word_embeds', features.Embeddings(embeddings, pool='max'))])
     elif ftr == 'embeddings+ngram':
         count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
         count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
@@ -264,8 +291,9 @@ if __name__ == '__main__':
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         print('Done')
-        vectorizer = FeatureUnion([('word', count_word),
-                                    ('char', count_char),('word_embeds', features.Embeddings(embeddings, pool='max'))])
+        vectorizer = FeatureUnion([ ('word', count_word),
+                                    ('char', count_char),
+                                    ('word_embeds', features.Embeddings(embeddings, pool='max'))])
 
 
     # Set up SVM classifier with unbalanced class weights
@@ -286,21 +314,36 @@ if __name__ == '__main__':
                             ('classify', clf)])
 
 
+
     '''
     Actual training and predicting:
     '''
 
     if evlt == 'cv10':
-        print("10-fold cross validation results:")
-        print(cross_validate(classifier, Xtrain, Ytrain,cv=10))
+        print('10-fold cross validation results:')
+        results = (cross_validate(classifier, Xtrain, Ytrain,cv=10))
+        # print(results)
+        print(sum(results['test_score']) / 10)
+        print('\n\nDone, used the following parameters:')
+        print('train: {}'.format(trainPath))
+        if ftr != 'ngram':
+            print('embed: {}'.format(path_to_embs))
+        print('feats: {}'.format(ftr))
+        print('prepr: {}'.format(clean))
     elif evlt == 'traintest':
         classifier.fit(Xtrain,Ytrain)
         Yguess = classifier.predict(Xtest)
-        print("train test results:")
+        print('train test results:')
         print(accuracy_score(Ytest, Yguess))
         print(precision_recall_fscore_support(Ytest, Yguess, average='weighted'))
         print(classification_report(Ytest, Yguess))
-    print('Done.')
+        print('\n\nDone, used the following parameters:')
+        print('train: {}'.format(trainPath))
+        print('tests: {}'.format(testPath))
+        if ftr != 'ngram':
+            print('embed: {}'.format(path_to_embs))
+        print('feats: {}'.format(ftr))
+        print('prepr: {}'.format(clean))
 
 
 
