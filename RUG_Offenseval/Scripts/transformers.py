@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from spacy import load as spacy_load
 from joblib import load
-nlp = spacy_load('en')
+# nlp = spacy_load('en')
 
 class naiveOffensiveWordSimilarity(TransformerMixin):
     def __init__(self, embeddings, offenseWordList):

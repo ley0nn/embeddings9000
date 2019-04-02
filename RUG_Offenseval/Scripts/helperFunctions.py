@@ -132,17 +132,31 @@ def load_embeddings(embedding_file):
     if embedding_file.endswith('.txt'):
         w2v = {}
         vocab = []
-        f = open(embedding_file,'r')
-        for line in f:
-            values = line.split()
-            word = values[0]
-            try:
-                float(values[1])
-            except ValueError:
-                continue
-            coefs = np.asarray(values[1:], dtype='float')
-            w2v[word] = coefs
-            vocab.append(word)
+        try:
+            f = open(embedding_file,'r')
+            for line in f:
+                values = line.split()
+                word = values[0]
+                try:
+                    float(values[1])
+                except ValueError:
+                    continue
+                coefs = np.asarray(values[1:], dtype='float')
+                w2v[word] = coefs
+                vocab.append(word)
+        except UnicodeDecodeError:
+            f = open(embedding_file,'rb')
+            for line in f:
+                values = line.split()
+                word = values[0]
+                try:
+                    float(values[1])
+                except ValueError:
+                    continue
+                coefs = np.asarray(values[1:], dtype='float')
+                w2v[word] = coefs
+                vocab.append(word)
+
         print ("Done.",len(w2v)," words loaded!")
         return w2v, vocab
         f.close()
@@ -162,6 +176,11 @@ def clean_samples(samples):
         tw = re.sub(r'http\S+\s?', '', tw)
         tw = re.sub(r'\#', '', tw)
         new_samples.append(tw)
+
+        # tw = re.sub(r'@\S+','<USER>', tw)
+        # tw = re.sub(r'\|LBR\|', '', tw)
+        # tw = re.sub(r'http\S+\s?', '<URL>', tw)
+        # tw = re.sub(r'\#', '<HASHTAG>', tw)
 
     return new_samples
 
