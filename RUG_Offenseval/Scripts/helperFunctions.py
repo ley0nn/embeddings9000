@@ -187,6 +187,7 @@ def clean_samples(samples):
     return new_samples
 
 def clean_samples_ruby(samples):
+	# tmpname = 'tmp_' + time.time() + '.txt'
     with open('tmp_file.txt', 'w') as tmp_file:
          for line in samples:
              tmp_file.write(line + '\n')

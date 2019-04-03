@@ -3,12 +3,12 @@ SVM systems for germeval, modified for English data from twitter and reddit, wit
 original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 '''
 #### PARAMS #############################################
-source = 'Twitter'      ## options: Twitter, Reddit
-# source = 'Reddit'
+source = 'Twitter'      ## options: Twitter, Reddit - Leon: I applied this on semeval&waseem
+# source = 'Reddit'       #Leon: I applied this on wikimedia
 
 # dataSet = 'other'
-# dataSet = 'WaseemHovy'
-dataSet = 'standard'
+dataSet = 'WaseemHovy'
+# dataSet = 'standard'
 # dataSet = 'wikimedia'
 
 # dataSet = 'other_waseem_standardVSwikimedia'
@@ -25,13 +25,13 @@ ftr = 'embeddings+ngram'
 evlt = 'cv10'
 # evlt = 'traintest'
 
-# clean = 'none'
+clean = 'none'
 # clean = 'std'     # PPsmall
-clean = 'ruby'    # PPbig
+# clean = 'ruby'    # PPbig
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
-# trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
-trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
+trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
+# trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
 testPath = ''
@@ -42,8 +42,8 @@ testPath = ''
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
-path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-# path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
+# path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
+path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
 
 
 #########################################################
@@ -92,7 +92,6 @@ MWET = MWETokenizer([   ('<', 'url', '>'),
 def ntlktokenizer(x):
     tokens = word_tokenize(x)           # tokenize
     tokens = MWET.tokenize(tokens)      # fix <url> and <user> etc.
-    print(tokens)
 
     return ' '.join(tokens)
 
@@ -323,6 +322,7 @@ if __name__ == '__main__':
             print('embed: {}'.format(path_to_embs))
         print('feats: {}'.format(ftr))
         print('prepr: {}'.format(clean))
+        print('sourc: {} - datas: {}'.format(source, dataSet))
     elif evlt == 'traintest':
         classifier.fit(Xtrain,Ytrain)
         Yguess = classifier.predict(Xtest)
@@ -337,6 +337,7 @@ if __name__ == '__main__':
             print('embed: {}'.format(path_to_embs))
         print('feats: {}'.format(ftr))
         print('prepr: {}'.format(clean))
+        print('sourc: {} - datas: {}'.format(source, dataSet))
 
 
 
