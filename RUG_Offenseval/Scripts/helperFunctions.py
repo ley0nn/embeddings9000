@@ -1,5 +1,6 @@
 
 import re
+import time
 import random
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -187,16 +188,18 @@ def clean_samples(samples):
     return new_samples
 
 def clean_samples_ruby(samples):
-	# tmpname = 'tmp_' + time.time() + '.txt'
-    with open('tmp_file.txt', 'w') as tmp_file:
-         for line in samples:
-             tmp_file.write(line + '\n')
+    tmpname = 'tmpdir/tmp_' + str(time.time()) + '.txt'
+    with open(tmpname, 'w') as tmp_file:
+        for line in samples:
+            tmp_file.write(line + '\n')
 
-    clean = os.popen('ruby -n preprocess-twitter.rb tmp_file.txt').read().split('\n')
+    command_tmp = 'ruby -n preprocess-twitter.rb ' + tmpname
+    clean = os.popen(command_tmp).read().split('\n')
+
     new_samples = []
-    for line in clean:
-        if not line:
-            continue
+    for line in clean[:-1]:
+        # if not line:
+        #     continue
         new_samples.append(line)
     return new_samples
 

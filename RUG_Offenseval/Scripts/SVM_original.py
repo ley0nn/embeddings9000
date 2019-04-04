@@ -19,15 +19,15 @@ dataSet = 'WaseemHovy'
 # dataSet = 'waseem_standard_wikimedia_otherVSstandardTest_otherTest'
 
 # ftr = 'ngram'
-# ftr = 'embeddings'
-ftr = 'embeddings+ngram'
+ftr = 'embeddings'
+# ftr = 'embeddings+ngram'
 
 evlt = 'cv10'
 # evlt = 'traintest'
 
-clean = 'none'
+# clean = 'none'
 # clean = 'std'     # PPsmall
-# clean = 'ruby'    # PPbig
+clean = 'ruby'    # PPbig
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
@@ -42,9 +42,10 @@ testPath = ''
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
-# path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-path_to_embs = '../../glove.twitter.27B/glove.twitter.27B.200d.txt'
+path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
+# path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
 
+glove_embeds_path = '../../embeddings/glove.twitter.27B.200d.txt'
 
 #########################################################
 
@@ -273,8 +274,13 @@ if __name__ == '__main__':
     elif ftr == 'embeddings':
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
+        # glove_embeds = {}
+        if path_to_embs == glove_embeds_path:
+            glove_embeds = embeddings
+        else:
+            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
         print('Done')
-        vectorizer = features.Embeddings(embeddings, pool='max')
+        vectorizer = features.Embeddings(embeddings, glove_embeds, pool='max')
 
     elif ftr == 'embeddings+ngram':
         count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
@@ -282,10 +288,15 @@ if __name__ == '__main__':
         # path_to_embs = 'embeddings/model_reset_random.bin'
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
+        # glove_embeds = {}
+        if path_to_embs == glove_embeds_path:
+            glove_embeds = embeddings
+        else:
+            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
         print('Done')
         vectorizer = FeatureUnion([ ('word', count_word),
                                     ('char', count_char),
-                                    ('word_embeds', features.Embeddings(embeddings, pool='max'))])
+                                    ('word_embeds', features.Embeddings(embeddings, glove_embeds, pool='max'))])
 
 
     # Set up SVM classifier with unbalanced class weights
@@ -313,7 +324,7 @@ if __name__ == '__main__':
 
     if evlt == 'cv10':
         print('10-fold cross validation results:')
-        results = (cross_validate(classifier, Xtrain, Ytrain,cv=10))
+        results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
         # print(results)
         print(sum(results['test_score']) / 10)
         print('\n\nDone, used the following parameters:')

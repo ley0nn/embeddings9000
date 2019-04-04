@@ -18,31 +18,32 @@ from scipy.sparse import csr_matrix
 class Embeddings(TransformerMixin):
     '''Transformer object turning a sentence (or tweet) into a single embedding vector'''
 
-    def __init__(self, word_embeds, pool='average'):
+    def __init__(self, word_embeds, glove_embeds, pool='average'):
         '''
         Required input: word embeddings stored in dict structure available for look-up
         pool: sentence embeddings to be obtained either via average pooling ('average') or max pooing ('max') from word embeddings. Default is average pooling.
         '''
         self.word_embeds = word_embeds
         self.pool_method = pool
+        self.glove_embeds = glove_embeds
 
     def transform(self, X, **transform_params):
         '''
         Transformation function: X is list of sentence/tweet - strings in the train data. Returns list of embeddings, each embedding representing one tweet
         '''
-        return [self.get_sent_embedding(sent, self.word_embeds, self.pool_method) for sent in X]
+        return [self.get_sent_embedding(sent, self.word_embeds, self.glove_embeds, self.pool_method) for sent in X]
 
     def fit(self, X, y=None, **fit_params):
         return self
 
-    def get_sent_embedding(self, sentence, word_embeds, pool):
+    def get_sent_embedding(self, sentence, word_embeds, glove_embeds, pool):
         '''
         Obtains sentence embedding representing a whole sentence / tweet
         '''
         # firstword = sentence.split()[0]
         # print(word_embeds.keys())
         # exit()
-        
+
         # simply get dim of embeddings
         l_vector = len(word_embeds['a'])
 
@@ -51,12 +52,20 @@ class Embeddings(TransformerMixin):
         # [[0.234234,-0.276583...][0.2343, -0.7356354, 0.123 ...][0.2344356, 0.12477...]...]
         list_of_embeddings = [word_embeds[word.lower()] for word in sentence.split() if word.lower() in word_embeds]
 
-	    # Obtain sentence embeddings either by average or max pooling on word embeddings of the sentence
+        list_of_embeddings = []
+        for word in sentence.split():
+            if word.lower() in word_embeds:
+                list_of_embeddings.append(word_embeds[word.lower()])
+            elif word.lower() in glove_embeds:
+                list_of_embeddings.append(glove_embeds[word.lower()])
+
+
+        # Obtain sentence embeddings either by average or max pooling on word embeddings of the sentence
         # Option via argument 'pool'
         if pool == 'average':
             sent_embedding = [sum(col) / float(len(col)) for col in zip(*list_of_embeddings)]  # average pooling
         elif pool == 'max':
-            sent_embedding = [max(col) for col in zip(*list_of_embeddings)]	# max pooling
+            sent_embedding = [max(col) for col in zip(*list_of_embeddings)]    # max pooling
         else:
             raise ValueError('Unknown pooling method!')
 
