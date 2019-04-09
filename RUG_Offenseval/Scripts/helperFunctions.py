@@ -90,9 +90,11 @@ def read_corpus(corpus_file, binary=True):
             tweets.append(data[1])
 
             if data[2] == '1':
-                labels.append('OFF')
+                # labels.append('OFF')
+                labels.append(1)
             elif data[2] == '0':
-                labels.append('NOT')
+                # labels.append('NOT')
+                labels.append(0)
 
     return ids[1:], tweets[1:], labels
 

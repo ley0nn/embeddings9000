@@ -7,8 +7,8 @@ source = 'Twitter'      ## options: Twitter, Reddit - Leon: I applied this on se
 # source = 'Reddit'       #Leon: I applied this on wikimedia
 
 # dataSet = 'other'
-dataSet = 'WaseemHovy'
-# dataSet = 'standard'
+# dataSet = 'WaseemHovy'
+dataSet = 'standard'
 # dataSet = 'wikimedia'
 
 # dataSet = 'other_waseem_standardVSwikimedia'
@@ -22,20 +22,23 @@ dataSet = 'WaseemHovy'
 ftr = 'embeddings'
 # ftr = 'embeddings+ngram'
 
+cls = 'bilstm'
+# cls = ''
+
 evlt = 'cv10'
 # evlt = 'traintest'
 
-# clean = 'none'
+clean = 'none'
 # clean = 'std'     # PPsmall
-clean = 'ruby'    # PPbig
+# clean = 'ruby'    # PPbig
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
-trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
-# trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
+# trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
+trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
-testPath = ''
-# testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
+# testPath = ''
+testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
 
 # path_to_embs = '../../embeddings/reddit_general.txt'
@@ -75,6 +78,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 
 from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
+from BiLSTM import biLSTM
 
 MWET = MWETokenizer([   ('<', 'url', '>'),
                         ('<', 'user', '>'),
@@ -297,6 +301,11 @@ if __name__ == '__main__':
         vectorizer = FeatureUnion([ ('word', count_word),
                                     ('char', count_char),
                                     ('word_embeds', features.Embeddings(embeddings, glove_embeds, pool='max'))])
+
+    if cls == 'bilstm':
+        training = True
+        output = True
+        Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings)
 
 
     # Set up SVM classifier with unbalanced class weights
