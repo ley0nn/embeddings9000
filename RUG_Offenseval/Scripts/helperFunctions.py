@@ -12,7 +12,7 @@ import os
 
 
 
-def read_corpus_otherSet(corpus_file, binary=True): #Facebook Enlgish
+def read_corpus_otherSet(corpus_file, cls, binary=True): #Facebook Enlgish
     '''Reading in data from corpus file'''
     with open(corpus_file, 'r', encoding='utf-8') as fi:
         fi = fi.readlines()
@@ -37,10 +37,16 @@ def read_corpus_otherSet(corpus_file, binary=True): #Facebook Enlgish
             ids.append(data[0])
             tweets.append(data[1])
             if binary:
-                if data[2] == 'NAG':
-                    labels.append('NOT')
+                if cls == 'bilstm':
+                    if data[2] == 'NAG':
+                        labels.append(0)
+                    else:
+                        labels.append(1)
                 else:
-                    labels.append('OFF')
+                    if data[2] == 'NAG':
+                        labels.append('NOT')
+                    else:
+                        labels.append('OFF')
             else:
                 labels.append(data[2])
             line += 1
@@ -48,7 +54,7 @@ def read_corpus_otherSet(corpus_file, binary=True): #Facebook Enlgish
     print("read " + str(len(tweets)) + " tweets.")
     return ids, tweets, labels
 
-def read_corpus_WaseemHovy(corpus_file):
+def read_corpus_WaseemHovy(corpus_file,cls):
     '''Reading in data from corpus file'''
     ids = []
     tweets = []
@@ -63,10 +69,16 @@ def read_corpus_WaseemHovy(corpus_file):
                 tweets.append("".join(data[1:len(data) - 2]))
             else:
                 tweets.append(data[1])
-            if data[len(data)-1] == 'none':
-                labels.append('NOT')
+            if cls == 'bilstm':
+                if data[len(data)-1] == 'none':
+                    labels.append(0)
+                else:
+                    labels.append(1)
             else:
-                labels.append('OFF')
+                if data[len(data)-1] == 'none':
+                    labels.append('NOT')
+                else:
+                    labels.append('OFF')
     mapIndexPosition = list(zip(ids, tweets, labels))
     random.seed(1337)
     shuffle(mapIndexPosition)
@@ -74,7 +86,7 @@ def read_corpus_WaseemHovy(corpus_file):
 
     return ids, tweets, labels
 
-def read_corpus(corpus_file, binary=True):
+def read_corpus(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
     ids = []
     tweets = []
@@ -88,20 +100,26 @@ def read_corpus(corpus_file, binary=True):
 
             ids.append(data[0])
             tweets.append(data[1])
-
-            if data[2] == '1':
-                # labels.append('OFF')
-                labels.append(1)
-            elif data[2] == '0':
-                # labels.append('NOT')
-                labels.append(0)
+            if cls == 'bilstm':
+                if data[2] == '1':
+                    labels.append(1)
+                elif data[2] == '0':
+                    labels.append(0)
+            else:
+                if data[2] == '1':
+                    labels.append('OFF')
+                elif data[2] == '0':
+                    labels.append('NOT')
 
     return ids[1:], tweets[1:], labels
 
 
-def read_corpus_wikimedia(corpus_file, binary=True):
+def read_corpus_wikimedia(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
-    label_dict = {True: 'OFF', False: 'NOT'}
+    if cls == 'bilstm':
+        label_dict = {True: 'OFF', False: 'NOT'}
+    else:
+        label_dict = {True: 1, False: 0}
 
     comments = pd.read_csv(corpus_file, sep = '\t')
     ids = list(comments['rev_id'])
