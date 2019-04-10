@@ -25,8 +25,8 @@ ftr = 'embeddings'
 cls = 'bilstm'
 # cls = ''
 
-evlt = 'cv10'
-# evlt = 'traintest'
+# evlt = 'cv10'
+evlt = 'traintest'
 
 clean = 'none'
 # clean = 'std'     # PPsmall
@@ -34,7 +34,8 @@ clean = 'none'
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
-trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
+# trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
+trainPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
 # testPath = ''
@@ -45,8 +46,8 @@ testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
-path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-# path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
+# path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
+path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
 
 glove_embeds_path = '../../embeddings/glove.twitter.27B.200d.txt'
 
@@ -78,7 +79,6 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 
 from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
-from BiLSTM import biLSTM
 
 MWET = MWETokenizer([   ('<', 'url', '>'),
                         ('<', 'user', '>'),
@@ -303,17 +303,18 @@ if __name__ == '__main__':
                                     ('word_embeds', features.Embeddings(embeddings, glove_embeds, pool='max'))])
 
     if cls == 'bilstm':
-        training = True
+        from BiLSTM import biLSTM
+        training = False
         output = True
-        Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings)
+        Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings)
 
 
     # Set up SVM classifier with unbalanced class weights
-    if TASK == 'binary':
+    if TASK == 'binary' and cls != 'bilstm':
         # cl_weights_binary = None
         cl_weights_binary = {'NOT':1/nonOffensiveRatio, 'OFF':1/offensiveRatio}
         clf = LinearSVC(class_weight=cl_weights_binary)
-    else:
+    elif TASK == 'multi':
         # cl_weights_multi = None
         cl_weights_multi = {'OTHER':0.5,
                             'ABUSE':3,
@@ -321,9 +322,10 @@ if __name__ == '__main__':
                             'PROFANITY':4}
         clf = LinearSVC(class_weight=cl_weights_multi)
 
-    classifier = Pipeline([
-                            ('vectorize', vectorizer),
-                            ('classify', clf)])
+    if cls != 'bilstm':
+        classifier = Pipeline([
+                                ('vectorize', vectorizer),
+                                ('classify', clf)])
 
 
 
@@ -344,8 +346,9 @@ if __name__ == '__main__':
         print('prepr: {}'.format(clean))
         print('sourc: {} - datas: {}'.format(source, dataSet))
     elif evlt == 'traintest':
-        classifier.fit(Xtrain,Ytrain)
-        Yguess = classifier.predict(Xtest)
+        if cls != 'bilstm':
+            classifier.fit(Xtrain,Ytrain)
+            Yguess = classifier.predict(Xtest)
         print('train test results:')
         print(accuracy_score(Ytest, Yguess))
         print(precision_recall_fscore_support(Ytest, Yguess, average='weighted'))

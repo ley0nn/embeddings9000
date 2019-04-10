@@ -149,9 +149,9 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 
 		filepath = "TESTmodel.h5"
 		checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-		es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=2)
+		es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=1)
 		callbacks_list = [checkpoint, es]
-		model.fit(X_train_reshaped, y_train_reshaped, epochs=10, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
+		model.fit(X_train_reshaped, y_train_reshaped, epochs=2, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
 		loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=1)
 
 		print("Done training")
@@ -167,7 +167,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 
 		max_length = max([len(s) for s in Xtrain+ Xtest])
 		datalist_reshaped = t.texts_to_sequences(Xtest)
-		datalist_reshaped = pad_sequences(datalist_reshaped, padding='post')#maxlen=851,
+		datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=851, padding='post')#maxlen=851,
 
 		print("Data processed! Predicting values...")
 		score = model.predict(datalist_reshaped)
@@ -187,6 +187,6 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 		print("Predictions made! returning output")
 		print(set(Ytest))
 		print(set(yguess))
-		return yguess#, accuracy, f1score, report
+		return Ytest, yguess#, accuracy, f1score, report
 
 	return True
