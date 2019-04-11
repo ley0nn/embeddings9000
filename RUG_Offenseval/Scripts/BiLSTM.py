@@ -111,7 +111,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 		Xtrain = t.texts_to_sequences(Xtrain)
 		max_length = max([len(s) for s in Xtrain + Xtest])
 		X_train_reshaped = pad_sequences(Xtrain, maxlen=max_length, padding='post')
-		with open('TESTtokenizer.pickle', 'wb') as handle:
+		with open('models/B17_gpu_tokenizer.pickle', 'wb') as handle:
 			pickle.dump(t, handle, protocol=pickle.HIGHEST_PROTOCOL)
 		print('Padded the data')
 		## Loading in word embeddings and setting up matrix
@@ -147,27 +147,31 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 		print("Done preparing testdata")
 
 
-		filepath = "TESTmodel.h5"
+		filepath = "models/B17_gpu_model.h5"
 		checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-		es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=1)
+		es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
 		callbacks_list = [checkpoint, es]
-		model.fit(X_train_reshaped, y_train_reshaped, epochs=2, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
+		model.fit(X_train_reshaped, y_train_reshaped, epochs=100, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
 		loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=1)
 
 		print("Done training")
 
+		if not output:
+			exit()
+
 	if output:
 		print("Loading tokenizer...")
-		with open('TESTtokenizer.pickle', 'rb') as handle:
+		with open('models/B17_gpu_tokenizer.pickle', 'rb') as handle:
 			t = pickle.load(handle)
 		handle.close()
 		print("Tokenizer loaded! Loading model...")
-		model = load_model("TESTmodel.h5", custom_objects={'AttentionWithContext': AttentionWithContext})
+		model = load_model("models/B17_gpu_model.h5", custom_objects={'AttentionWithContext': AttentionWithContext})
 		print("Model loaded! Processing data...")
 
 		max_length = max([len(s) for s in Xtrain+ Xtest])
+		print('max_length: ', max_length)
 		datalist_reshaped = t.texts_to_sequences(Xtest)
-		datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=851, padding='post')#maxlen=851,
+		datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')#maxlen=851,
 
 		print("Data processed! Predicting values...")
 		score = model.predict(datalist_reshaped)

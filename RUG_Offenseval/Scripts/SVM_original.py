@@ -8,7 +8,7 @@ source = 'Twitter'      ## options: Twitter, Reddit - Leon: I applied this on se
 
 # dataSet = 'other'
 # dataSet = 'WaseemHovy'
-dataSet = 'standard'
+# dataSet = 'standard'
 # dataSet = 'wikimedia'
 
 # dataSet = 'other_waseem_standardVSwikimedia'
@@ -32,22 +32,22 @@ clean = 'none'
 # clean = 'std'     # PPsmall
 # clean = 'ruby'    # PPbig
 
-# trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
+trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
 # trainPath = '../../public_development_en/train_en.tsv'        # SemEval - standard
-trainPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
+# trainPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # trainPath = '../../4563973/toxicity_annotated_comments.tsv'     # Wikimedia toxicity_annotated_comments
 
 # testPath = ''
-testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
-# testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
+# testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
+testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
 
 # path_to_embs = '../../embeddings/reddit_general.txt'
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
-# path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
+path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
+# path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
 
 glove_embeds_path = '../../embeddings/glove.twitter.27B.200d.txt'
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         IDsTrain,Xtrain,Ytrain = helperFunctions.read_corpus(trainPath,cls)
         if testPath == '../../public_development_en/dev_en.tsv':
             IDsTest,Xtest,Ytest = helperFunctions.read_corpus(testPath,cls)
-    elif dataSet == 'other_waseem_standardVSwikimedia':
+    elif dataSet == 'other_waseem_standardVSWwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = helperFunctions.read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
             IDsTrain.append(id)
@@ -304,8 +304,8 @@ if __name__ == '__main__':
 
     if cls == 'bilstm':
         from BiLSTM import biLSTM
-        training = False
-        output = True
+        training = True
+        output = False
         Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings)
 
 
