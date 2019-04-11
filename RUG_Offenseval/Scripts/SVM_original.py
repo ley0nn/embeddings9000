@@ -25,6 +25,16 @@ ftr = 'embeddings'
 # cls = 'bilstm'
 cls = ''
 
+tknzr = 'models/B2_tokenizer.pickle'
+# tknzr = 'models/B3_tokenizer.pickle'
+# tknzr = 'models/B4_tokenizer.pickle'
+# tknzr = 'models/B5_tokenizer.pickle'
+
+model = 'models/B2_model.h5'
+# model = 'models/B3_model.h5'
+# model = 'models/B4_model.h5'
+# model = 'models/B5_model.h5'
+
 # evlt = 'cv10'
 evlt = 'traintest'
 
@@ -108,13 +118,11 @@ if __name__ == '__main__':
     Preparing data
     '''
 
-
     print('Reading in ' + source + ' training data...' + dataSet)
 
     IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK)
 
     print('Done reading in data...')
-
 
     offensiveRatio = Ytrain.count('OFF')/len(Ytrain)
     nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
@@ -132,7 +140,6 @@ if __name__ == '__main__':
     '''
     Preparing vectorizer and classifier
     '''
-    exit()
 
     # Vectorizing data / Extracting features
     print('Preparing tools (vectorizer, classifier) ...')
@@ -183,7 +190,7 @@ if __name__ == '__main__':
         from BiLSTM import biLSTM
         training = True
         output = False
-        Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings)
+        Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings, tknzr, model)
 
 
     # Set up SVM classifier with unbalanced class weights

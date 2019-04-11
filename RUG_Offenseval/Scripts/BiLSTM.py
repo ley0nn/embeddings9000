@@ -101,7 +101,7 @@ class AttentionWithContext(Layer):
 		return (input_shape[0], input_shape[-1],)
 
 
-def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
+def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, model):
 	if training:
 		y_train_reshaped = to_categorical(Ytrain, num_classes=2)
 
@@ -111,7 +111,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 		Xtrain = t.texts_to_sequences(Xtrain)
 		max_length = max([len(s) for s in Xtrain + Xtest])
 		X_train_reshaped = pad_sequences(Xtrain, maxlen=max_length, padding='post')
-		with open('models/B17_gpu_tokenizer.pickle', 'wb') as handle:
+		with open(tknzr, 'wb') as handle:
 			pickle.dump(t, handle, protocol=pickle.HIGHEST_PROTOCOL)
 		print('Padded the data')
 		## Loading in word embeddings and setting up matrix
@@ -147,7 +147,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 		print("Done preparing testdata")
 
 
-		filepath = "models/B17_gpu_model.h5"
+		filepath = model
 		checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 		es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
 		callbacks_list = [checkpoint, es]
@@ -161,11 +161,11 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index):
 
 	if output:
 		print("Loading tokenizer...")
-		with open('models/B17_gpu_tokenizer.pickle', 'rb') as handle:
+		with open(tknzr, 'rb') as handle:
 			t = pickle.load(handle)
 		handle.close()
 		print("Tokenizer loaded! Loading model...")
-		model = load_model("models/B17_gpu_model.h5", custom_objects={'AttentionWithContext': AttentionWithContext})
+		model = load_model(model, custom_objects={'AttentionWithContext': AttentionWithContext})
 		print("Model loaded! Processing data...")
 
 		max_length = max([len(s) for s in Xtrain+ Xtest])
