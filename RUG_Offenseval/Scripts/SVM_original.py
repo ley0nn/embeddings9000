@@ -25,15 +25,15 @@ ftr = 'embeddings'
 # cls = 'bilstm'
 cls = ''
 
-tknzr = 'models/B2_tokenizer.pickle'
-# tknzr = 'models/B3_tokenizer.pickle'
-# tknzr = 'models/B4_tokenizer.pickle'
-# tknzr = 'models/B5_tokenizer.pickle'
+tknzr = 'models/B2_tokenizer.pickle'    #reddit_general
+# tknzr = 'models/B3_tokenizer.pickle'  #reddit_polarised
+# tknzr = 'models/B4_tokenizer.pickle'  #twitter_glove
+# tknzr = 'models/B5_tokenizer.pickle'  #twitter_polarised_2016
 
-model = 'models/B2_model.h5'
-# model = 'models/B3_model.h5'
-# model = 'models/B4_model.h5'
-# model = 'models/B5_model.h5'
+model = 'models/B2_model.h5'            #reddit_general
+# model = 'models/B3_model.h5'          #reddit_polarised
+# model = 'models/B4_model.h5'          #twitter_glove
+# model = 'models/B5_model.h5'          #twitter_polarised_2016
 
 # evlt = 'cv10'
 evlt = 'traintest'
@@ -188,8 +188,8 @@ if __name__ == '__main__':
 
     if cls == 'bilstm':
         from BiLSTM import biLSTM
-        training = True
-        output = False
+        training = False
+        output = True
         Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings, tknzr, model)
 
 
