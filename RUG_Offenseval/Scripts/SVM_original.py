@@ -22,18 +22,18 @@ dataSet = 'standard'
 ftr = 'embeddings'
 # ftr = 'embeddings+ngram'
 
-# cls = 'bilstm'
-cls = ''
+cls = 'bilstm'
+# cls = ''
 
-tknzr = 'models/B2_tokenizer.pickle'    #reddit_general
-# tknzr = 'models/B3_tokenizer.pickle'  #reddit_polarised
-# tknzr = 'models/B4_tokenizer.pickle'  #twitter_glove
-# tknzr = 'models/B5_tokenizer.pickle'  #twitter_polarised_2016
+# tknzr = 'models/B2_tokenizer.pickle'    #reddit_general + semeval
+# tknzr = 'models/B3_tokenizer.pickle'  #reddit_polarised + semeval
+# tknzr = 'models/B4_tokenizer.pickle'  #twitter_glove + semeval
+tknzr = 'models/B5_tokenizer.pickle'  #twitter_polarised_2016 + semeval
 
-model = 'models/B2_model.h5'            #reddit_general
-# model = 'models/B3_model.h5'          #reddit_polarised
-# model = 'models/B4_model.h5'          #twitter_glove
-# model = 'models/B5_model.h5'          #twitter_polarised_2016
+# model = 'models/B2_model.h5'            #reddit_general + semeval
+# model = 'models/B3_model.h5'          #reddit_polarised + semeval
+# model = 'models/B4_model.h5'          #twitter_glove + semeval
+model = 'models/B5_model.h5'          #twitter_polarised_2016 + semeval
 
 # evlt = 'cv10'
 evlt = 'traintest'
@@ -55,8 +55,8 @@ testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
-path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
-# path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
+# path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
+path_to_embs = '../../embeddings/glove.twitter.27B.200d.txt'
 
 glove_embeds_path = '../../embeddings/glove.twitter.27B.200d.txt'
 
