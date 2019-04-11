@@ -8,18 +8,18 @@ source = 'Twitter'      ## options: Twitter, Reddit - Leon: I applied this on se
 
 # dataSet = 'other'
 # dataSet = 'WaseemHovy'
-dataSet = 'standard'
+# dataSet = 'standard'
 # dataSet = 'wikimedia'
 
-# dataSet = 'other_waseem_standardVSwikimedia'
+dataSet = 'other_waseem_standardVSwikimedia'
 # dataSet = 'other_waseem_wikimediaVSstandard'
 # dataSet = 'other_standard_wikimediaVSwaseem'
 # dataSet = 'waseem_standard_wikimediaVSother'
 # dataSet = 'waseem_standard_wikimedia_otherVSstackoverflow'
 # dataSet = 'waseem_standard_wikimedia_otherVSstandardTest_otherTest'
 
-# ftr = 'ngram'
-ftr = 'embeddings'
+ftr = 'ngram'
+# ftr = 'embeddings'
 # ftr = 'embeddings+ngram'
 
 cls = 'bilstm'
@@ -38,9 +38,9 @@ model = 'models/B5_model.h5'          #twitter_polarised_2016 + semeval
 # evlt = 'cv10'
 evlt = 'traintest'
 
-clean = 'none'
+# clean = 'none'
 # clean = 'std'     # PPsmall
-# clean = 'ruby'    # PPbig
+clean = 'ruby'    # PPbig
 
 # trainPath = '../../english/agr_en_train.csv'                    # Facebook english - other
 # trainPath = '../../Full_Tweets_June2016_Dataset.csv'          # WaseemHovy - waseemhovy
@@ -123,6 +123,10 @@ if __name__ == '__main__':
     IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK)
 
     print('Done reading in data...')
+    print('Train labels', set(Ytrain))
+    print('Test labels', set(Ytest))
+    print(cls)
+    exit()
 
     offensiveRatio = Ytrain.count('OFF')/len(Ytrain)
     nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
