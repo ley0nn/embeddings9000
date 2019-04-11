@@ -29,7 +29,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK):
         if testPath == '../../public_development_en/dev_en.tsv':
             IDsTest,Xtest,Ytest = read_corpus(testPath,cls)
 
-    elif dataSet == 'other_waseem_standardVSWwikimedia':
+    elif dataSet == 'other_waseem_standardVSwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
             IDsTrain.append(id)
@@ -142,7 +142,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK):
             Xtrain.append(x)
             Ytrain.append(y)
         IDsTest,Xtest,Ytest = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
-        IDsTest2,Xtest2,Ytest2 = read_corpus('../../english/agr_en_dev.csv',cls)
+        IDsTest2,Xtest2,Ytest2 = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
         for id,x,y in zip(IDsTest2,Xtest2,Ytest2):
             IDsTest.append(id)
             Xtest.append(x)
@@ -312,9 +312,9 @@ def read_corpus(corpus_file, cls, binary=True):
 def read_corpus_wikimedia(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
     if cls == 'bilstm':
-        label_dict = {True: 'OFF', False: 'NOT'}
+		label_dict = {True: 1, False: 0}
     else:
-        label_dict = {True: 1, False: 0}
+        label_dict = {True: 'OFF', False: 'NOT'}
 
     comments = pd.read_csv(corpus_file, sep = '\t')
     ids = list(comments['rev_id'])
