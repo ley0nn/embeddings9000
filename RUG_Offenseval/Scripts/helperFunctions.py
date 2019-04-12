@@ -258,9 +258,9 @@ def read_corpus(corpus_file, cls, binary=True):
 def read_corpus_wikimedia(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
     if cls == 'bilstm':
-        label_dict = {True: 'OFF', False: 'NOT'}
-    else:
         label_dict = {True: 1, False: 0}
+    else:
+        label_dict = {True: 'OFF', False: 'NOT'}
 
     comments = pd.read_csv(corpus_file, sep = '\t')
     ids = list(comments['rev_id'])

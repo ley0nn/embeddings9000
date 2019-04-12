@@ -147,7 +147,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 				checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 				es = EarlyStopping(monitor='loss', mode='min', verbose=1, patience=25)
 				callbacks_list = [checkpoint,es]
-				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=1, batch_size=64, callbacks=callbacks_list, verbose=1)
+				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=100, batch_size=64, callbacks=callbacks_list, verbose=1)
 				# evaluate the model
 				scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=1)
 				print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
