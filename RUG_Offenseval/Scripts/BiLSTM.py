@@ -13,7 +13,10 @@ from keras.models import load_model
 from sklearn.metrics import precision_recall_fscore_support, classification_report, accuracy_score
 import numpy as np
 import pickle
+from sklearn.model_selection import StratifiedKFold
 
+seed = 1337
+np.random.seed(seed)
 # Import Files
 
 
@@ -101,7 +104,7 @@ class AttentionWithContext(Layer):
 		return (input_shape[0], input_shape[-1],)
 
 
-def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, model):
+def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv):
 	if training:
 		y_train_reshaped = to_categorical(Ytrain, num_classes=2)
 
@@ -125,36 +128,70 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 
 		print("Loaded embeddings")
 
-		### Setting up model
-		embedding_layer = Embedding(vocab_size, 200, weights=[embedding_matrix], input_length=max_length, trainable=False, mask_zero=True)
-		sequence_input = Input(shape=(max_length,), dtype='int32')
-		embedded_sequences = embedding_layer(sequence_input)
-		l_lstm = Bidirectional(LSTM(512, return_sequences=True))(embedded_sequences)
-		l_drop = Dropout(0.4)(l_lstm)
-		l_att = AttentionWithContext()(l_drop)
-		preds = Dense(2, activation='softmax')(l_att)
-		model = Model(sequence_input, preds)
-		model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=['acc'])
-		print(model.summary())
-		print("Setting up model")
+		if cv:
+			# define 10-fold cross validation test harness https://machinelearningmastery.com/evaluate-performance-deep-learning-models-keras/
+			kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+			cvscores = []
+			for train, test in kfold.split(Xtrain, Ytrain):
+				### Setting up model
+				embedding_layer = Embedding(vocab_size, 200, weights=[embedding_matrix], input_length=max_length, trainable=False, mask_zero=True)
+				sequence_input = Input(shape=(max_length,), dtype='int32')
+				embedded_sequences = embedding_layer(sequence_input)
+				l_lstm = Bidirectional(LSTM(512, return_sequences=True))(embedded_sequences)
+				l_drop = Dropout(0.4)(l_lstm)
+				l_att = AttentionWithContext()(l_drop)
+				preds = Dense(2, activation='softmax')(l_att)
+				model = Model(sequence_input, preds)
+				model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=['acc'])
+				filepath = modelh5
+				checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
+				es = EarlyStopping(monitor='loss', mode='min', verbose=1, patience=25)
+				callbacks_list = [checkpoint,es]
+				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=1, batch_size=64, callbacks=callbacks_list, verbose=1)
+				# evaluate the model
+				scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=1)
+				print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+				cvscores.append(scores[1] * 100)
+			print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
+
+		else:
+			######## Preparing test data
+			y_test_reshaped = to_categorical(Ytest, num_classes=2)
+
+			X_test = t.texts_to_sequences(Xtest)
+			X_test_reshaped = pad_sequences(X_test, maxlen=max_length, padding='post')
+			print("Done preparing testdata")
+
+			### Setting up model
+			embedding_layer = Embedding(vocab_size, 200, weights=[embedding_matrix], input_length=max_length, trainable=False, mask_zero=True)
+			sequence_input = Input(shape=(max_length,), dtype='int32')
+			embedded_sequences = embedding_layer(sequence_input)
+			l_lstm = Bidirectional(LSTM(512, return_sequences=True))(embedded_sequences)
+			l_drop = Dropout(0.4)(l_lstm)
+			l_att = AttentionWithContext()(l_drop)
+			preds = Dense(2, activation='softmax')(l_att)
+			model = Model(sequence_input, preds)
+			model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=['acc'])
+			print(model.summary())
+			print("Setting up model")
 
 
-		######## Preparing test data
-		y_test_reshaped = to_categorical(Ytest, num_classes=2)
+			######## Preparing test data
+			y_test_reshaped = to_categorical(Ytest, num_classes=2)
 
-		X_test = t.texts_to_sequences(Xtest)
-		X_test_reshaped = pad_sequences(X_test, maxlen=max_length, padding='post')
-		print("Done preparing testdata")
+			X_test = t.texts_to_sequences(Xtest)
+			X_test_reshaped = pad_sequences(X_test, maxlen=max_length, padding='post')
+			print("Done preparing testdata")
 
 
-		filepath = model
-		checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-		es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
-		callbacks_list = [checkpoint, es]
-		model.fit(X_train_reshaped, y_train_reshaped, epochs=100, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
-		loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=1)
+			filepath = model
+			checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+			es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
+			callbacks_list = [checkpoint, es]
+			model.fit(X_train_reshaped, y_train_reshaped, epochs=100, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
+			loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=1)
 
-		print("Done training")
+			print("Done training")
 
 		if not output:
 			exit()
