@@ -101,6 +101,11 @@ from sklearn.metrics import precision_recall_fscore_support
 
 from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
 import argparse
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+seed = 1337
+np.random.seed(seed)
 
 
 MWET = MWETokenizer([   ('<', 'url', '>'),
@@ -236,7 +241,10 @@ if __name__ == '__main__':
 		from BiLSTM import biLSTM
 		training = True
 		output = False
-		cv = True
+		cv = False
+		traindev = True
+		if traindev:
+			Xtrain, Xtest, Ytrain, Ytest = train_test_split(Xtrain, Ytrain, test_size=0.33, random_state=seed)
 		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings, tknzr, modelh5, cv)
 
 

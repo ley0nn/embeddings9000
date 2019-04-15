@@ -14,6 +14,7 @@ from sklearn.metrics import precision_recall_fscore_support, classification_repo
 import numpy as np
 import pickle
 from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import train_test_split
 
 seed = 1337
 np.random.seed(seed)
@@ -144,12 +145,12 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 				model = Model(sequence_input, preds)
 				model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=['acc'])
 				filepath = modelh5
-				checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
-				es = EarlyStopping(monitor='loss', mode='min', verbose=1, patience=25)
+				checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+				es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
 				callbacks_list = [checkpoint,es]
-				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=100, batch_size=64, callbacks=callbacks_list, verbose=1)
+				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=100, validation_data=(X_train_reshaped[test], y_train_reshaped[test]), batch_size=64, callbacks=callbacks_list, verbose=0)
 				# evaluate the model
-				scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=1)
+				scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=0)
 				print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 				cvscores.append(scores[1] * 100)
 			print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
@@ -184,12 +185,12 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 			print("Done preparing testdata")
 
 
-			filepath = model
+			filepath = modelh5
 			checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 			es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
 			callbacks_list = [checkpoint, es]
-			model.fit(X_train_reshaped, y_train_reshaped, epochs=100, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=1)
-			loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=1)
+			model.fit(X_train_reshaped, y_train_reshaped, epochs=100, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=0)
+			loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=0)
 
 			print("Done training")
 
