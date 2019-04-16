@@ -142,6 +142,10 @@ if __name__ == '__main__':
 	parser.add_argument('-pte', type=str, help='path_to_embs')
 	parser.add_argument('-evlt', type=str, help='evlt')
 	parser.add_argument('-cln', type=str, help='clean')
+	parser.add_argument('-lstmTrn', type=helperFunctions.str2bool, help='bilstm training True/False')
+	parser.add_argument('-lstmOp', type=helperFunctions.str2bool, help='bilstm output True/False')
+	parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
+	parser.add_argument('-lstmCV', type=helperFunctions.str2bool, help='bilstm cv True/False')
 	args = parser.parse_args()
 
 	source = args.src
@@ -155,6 +159,15 @@ if __name__ == '__main__':
 	path_to_embs = args.pte
 	evlt = args.evlt
 	clean = args.cln
+	lstmTraining = args.lstmTrn
+	lstmOutput = args.lstmOp
+	lstmTrainDev = args.lstmTd
+	lstmCV = args.lstmCV
+
+	print(lstmTraining)
+	print(lstmOutput)
+	print(lstmTrainDev)
+	print(lstmCV)
 
 	TASK = 'binary'
 	#TASK = 'multi'
@@ -239,13 +252,13 @@ if __name__ == '__main__':
 
 	if cls == 'bilstm':
 		from BiLSTM import biLSTM
-		training = True
-		output = False
-		cv = False
-		traindev = True
-		if traindev:
+		# training = True
+		# output = False
+		# cv = True
+		# traindev = False
+		if lstmTrainDev:
 			Xtrain, Xtest, Ytrain, Ytest = train_test_split(Xtrain, Ytrain, test_size=0.33, random_state=seed)
-		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings, tknzr, modelh5, cv)
+		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV)
 
 
 	# Set up SVM classifier with unbalanced class weights
