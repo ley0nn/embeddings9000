@@ -142,6 +142,8 @@ if __name__ == '__main__':
 	parser.add_argument('-pte', type=str, help='path_to_embs')
 	parser.add_argument('-evlt', type=str, help='evlt')
 	parser.add_argument('-cln', type=str, help='clean')
+	parser.add_argument('-eps', type=int, help='epochs')
+	parser.add_argument('-ptc', type=int, help='patience')
 	parser.add_argument('-lstmTrn', type=helperFunctions.str2bool, help='bilstm training True/False')
 	parser.add_argument('-lstmOp', type=helperFunctions.str2bool, help='bilstm output True/False')
 	parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
@@ -163,6 +165,8 @@ if __name__ == '__main__':
 	lstmOutput = args.lstmOp
 	lstmTrainDev = args.lstmTd
 	lstmCV = args.lstmCV
+	lstmEps = args.eps
+	lstmPtc = args.ptc
 
 	print(lstmTraining)
 	print(lstmOutput)
@@ -254,7 +258,7 @@ if __name__ == '__main__':
 		print('Train labels', set(Ytrain), len(Ytrain))
 		print('Test labels', set(Ytest), len(Ytest))
 		print(cls)
-		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV)
+		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc)
 
 
 	# Set up SVM classifier with unbalanced class weights

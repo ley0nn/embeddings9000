@@ -105,7 +105,7 @@ class AttentionWithContext(Layer):
 		return (input_shape[0], input_shape[-1],)
 
 
-def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv):
+def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv, eps, ptc):
 	if training:
 		y_train_reshaped = to_categorical(Ytrain, num_classes=2)
 
@@ -146,9 +146,9 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 				model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=['acc'])
 				filepath = modelh5
 				checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-				es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
+				es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=ptc)
 				callbacks_list = [checkpoint,es]
-				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=100, validation_data=(X_train_reshaped[test], y_train_reshaped[test]), batch_size=64, callbacks=callbacks_list, verbose=0)
+				model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=eps, validation_data=(X_train_reshaped[test], y_train_reshaped[test]), batch_size=64, callbacks=callbacks_list, verbose=0)
 				# evaluate the model
 				scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=0)
 				print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
@@ -187,9 +187,9 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 
 			filepath = modelh5
 			checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-			es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
+			es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=ptc)
 			callbacks_list = [checkpoint, es]
-			model.fit(X_train_reshaped, y_train_reshaped, epochs=100, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=0)
+			model.fit(X_train_reshaped, y_train_reshaped, epochs=eps, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=0)
 			loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=0)
 
 			print("Done training")
@@ -206,7 +206,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 		model = load_model(modelh5, custom_objects={'AttentionWithContext': AttentionWithContext})
 		print("Model loaded! Processing data...")
 
-		max_length = max([len(s) for s in Xtrain+ Xtest])
+		max_length = max([len(s) for s in Xtrain + Xtest])
 		print('max_length: ', max_length)
 		datalist_reshaped = t.texts_to_sequences(Xtest)
 		datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')#maxlen=851,
