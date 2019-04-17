@@ -203,7 +203,7 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 			t = pickle.load(handle)
 		handle.close()
 		print("Tokenizer loaded! Loading model...")
-		model = load_model(model, custom_objects={'AttentionWithContext': AttentionWithContext})
+		model = load_model(modelh5, custom_objects={'AttentionWithContext': AttentionWithContext})
 		print("Model loaded! Processing data...")
 
 		max_length = max([len(s) for s in Xtrain+ Xtest])

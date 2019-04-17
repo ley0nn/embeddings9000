@@ -181,9 +181,6 @@ if __name__ == '__main__':
 	IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK)
 
 	print('Done reading in data...')
-	print('Train labels', set(Ytrain))
-	print('Test labels', set(Ytest))
-	print(cls)
 
 	offensiveRatio = Ytrain.count('OFF')/len(Ytrain)
 	nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
@@ -252,12 +249,11 @@ if __name__ == '__main__':
 
 	if cls == 'bilstm':
 		from BiLSTM import biLSTM
-		# training = True
-		# output = False
-		# cv = True
-		# traindev = False
 		if lstmTrainDev:
 			Xtrain, Xtest, Ytrain, Ytest = train_test_split(Xtrain, Ytrain, test_size=0.33, random_state=seed)
+		print('Train labels', set(Ytrain), len(Ytrain))
+		print('Test labels', set(Ytest), len(Ytest))
+		print(cls)
 		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV)
 
 
