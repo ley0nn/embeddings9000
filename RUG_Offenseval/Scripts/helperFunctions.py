@@ -12,7 +12,7 @@ from random import shuffle
 import pandas as pd
 import os
 
-def loaddata(dataSet, trainPath, testPath, cls, TASK):
+def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
 
     IDsTrain = []
     Xtrain = []
@@ -217,6 +217,18 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK):
         IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
         ## TODO: implement reading function for the Reddit data
 
+    if reverse:
+        tmp_id = IDsTest
+        tmp_x = Xtest
+        tmp_y = Ytest
+
+        IDsTest = IDsTrain
+        Xtest = Xtrain
+        Ytest = Ytrain
+        IDsTrain = tmp_id
+        Xtrain = tmp_x
+        Ytrain = tmp_y
+
     return IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest
 
 def read_corpus_otherSet(corpus_file, cls, binary=True): #Facebook Enlgish
@@ -349,13 +361,18 @@ def read_corpus_wikimedia(corpus_file, cls, binary=True):
 def read_corpus_stackoverflow(corpus_file,cls):
     '''Reading in data from corpus file'''
 
-    Offensive = []
-    Unwelcoming = []
-    Not_Constructive_Or_Off_Topic = []
-    Obsolete = []
-    Other = []
-    No_Longer_Needed = []
-    Too_Chatty = []
+    # Offensive = []
+    # Unwelcoming = []
+    # Not_Constructive_Or_Off_Topic = []
+    # Obsolete = []
+    # Other = []
+    # No_Longer_Needed = []
+    # Too_Chatty = []
+
+    ids = []
+    tweets = []
+    labels = []
+    count = 0
 
     with open(corpus_file) as csvfile:
         next(csvfile)
@@ -366,52 +383,63 @@ def read_corpus_stackoverflow(corpus_file,cls):
             if len(line) < 3 or flag == 'NA':
                 continue
 
-            if flag == 'Comment Rude Or Offensive':
-                Offensive.append(text)
-            elif flag == 'CommentUnwelcoming':
-                Unwelcoming.append(text)
-            elif flag == 'Comment Not Constructive Or Off Topic':
-                Not_Constructive_Or_Off_Topic.append(text)
-            elif flag == 'Comment Obsolete':
-                Obsolete.append(text)
-            elif flag == 'Comment Other':
-                Other.append(text)
-            elif flag == 'CommentNoLongerNeeded':
-                No_Longer_Needed.append(text)
-            elif flag == 'Comment Too Chatty':
-                Too_Chatty.append(text)
+            if cls == 'bilstm':
+                if flag == 'Comment Rude Or Offensive':
+                    labels.append(1)
+                    tweets.append(text)
+                    ids.append(count)
+                    count += 1
+            else:
+                if flag == 'Comment Rude Or Offensive':
+                    labels.append('OFF')
+                    tweets.append(text)
+                    ids.append(count)
+                    count += 1
 
-    n = 10000
-    random.seed(1337)
+            # elif flag == 'CommentUnwelcoming':
+            #     Unwelcoming.append(text)
+            # elif flag == 'Comment Not Constructive Or Off Topic':
+            #     Not_Constructive_Or_Off_Topic.append(text)
+            # elif flag == 'Comment Obsolete':
+            #     Obsolete.append(text)
+            # elif flag == 'Comment Other':
+            #     Other.append(text)
+            # elif flag == 'CommentNoLongerNeeded':
+            #     No_Longer_Needed.append(text)
+            # elif flag == 'Comment Too Chatty':
+            #     Too_Chatty.append(text)
 
-    list1 = random.sample(Unwelcoming, n)
-    list2 = random.sample(Not_Constructive_Or_Off_Topic, n)
-    list3 = random.sample(Obsolete, n)
-    list4 = random.sample(Other, n)
-    list5 = random.sample(No_Longer_Needed, n)
-    list6 = random.sample(Too_Chatty, n)
+    # n = 10000
+    # random.seed(1337)
+    #
+    # list1 = random.sample(Unwelcoming, n)
+    # list2 = random.sample(Not_Constructive_Or_Off_Topic, n)
+    # list3 = random.sample(Obsolete, n)
+    # list4 = random.sample(Other, n)
+    # list5 = random.sample(No_Longer_Needed, n)
+    # list6 = random.sample(Too_Chatty, n)
+    #
+    # not_list = list1 + list2 + list3 + list4 + list5+ list6
+    #
+    # ids = []
+    # tweets = []
+    # labels = []
+    # count = 0
+    #
+    # for comment in Offensive:
+    #     ids.append(count)
+    #     tweets.append(comment)
+    #     labels.append('OFF')
+    #     count += 1
+    # for comment in not_list:
+    #     ids.append(count)
+    #     tweets.append(comment)
+    #     labels.append('NOT')
+    #     count += 1
 
-    not_list = list1 + list2 + list3 + list4 + list5+ list6
-
-    ids = []
-    tweets = []
-    labels = []
-    count = 0
-
-    for comment in Offensive:
-        ids.append(count)
-        tweets.append(comment)
-        labels.append('OFF')
-        count += 1
-    for comment in not_list:
-        ids.append(count)
-        tweets.append(comment)
-        labels.append('NOT')
-        count += 1
-
-    mapIndexPosition = list(zip(ids, tweets, labels))
-    shuffle(mapIndexPosition)
-    ids, tweets, labels = zip(*mapIndexPosition)
+    # mapIndexPosition = list(zip(ids, tweets, labels))
+    # shuffle(mapIndexPosition)
+    # ids, tweets, labels = zip(*mapIndexPosition)
 
     return ids, tweets, labels
 

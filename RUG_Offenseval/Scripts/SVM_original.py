@@ -144,6 +144,7 @@ if __name__ == '__main__':
 	parser.add_argument('-cln', type=str, help='clean')
 	parser.add_argument('-eps', type=int, help='epochs')
 	parser.add_argument('-ptc', type=int, help='patience')
+	parser.add_argument('-rev', type=helperFunctions.str2bool, help='reverse 3vs1')
 	parser.add_argument('-lstmTrn', type=helperFunctions.str2bool, help='bilstm training True/False')
 	parser.add_argument('-lstmOp', type=helperFunctions.str2bool, help='bilstm output True/False')
 	parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
@@ -167,6 +168,7 @@ if __name__ == '__main__':
 	lstmCV = args.lstmCV
 	lstmEps = args.eps
 	lstmPtc = args.ptc
+	reverse = args.rev
 
 	print(lstmTraining)
 	print(lstmOutput)
@@ -182,7 +184,8 @@ if __name__ == '__main__':
 
 	print('Reading in ' + source + ' training data...' + dataSet)
 
-	IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK)
+	IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK, reverse)
+
 
 	print('Done reading in data...')
 
