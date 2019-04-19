@@ -157,11 +157,11 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 
 		else:
 			######## Preparing test data
-			y_test_reshaped = to_categorical(Ytest, num_classes=2)
-
-			X_test = t.texts_to_sequences(Xtest)
-			X_test_reshaped = pad_sequences(X_test, maxlen=max_length, padding='post')
-			print("Done preparing testdata")
+			# y_test_reshaped = to_categorical(Ytest, num_classes=2)
+			#
+			# X_test = t.texts_to_sequences(Xtest)
+			# X_test_reshaped = pad_sequences(X_test, maxlen=max_length, padding='post')
+			# print("Done preparing testdata")
 
 			### Setting up model
 			embedding_layer = Embedding(vocab_size, 200, weights=[embedding_matrix], input_length=max_length, trainable=False, mask_zero=True)
@@ -185,8 +185,8 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
 			print("Done preparing testdata")
 
 
-			filepath = modelh5
-			checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+			# filepath = modelh5
+			checkpoint = ModelCheckpoint(modelh5, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 			es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=ptc)
 			callbacks_list = [checkpoint, es]
 			model.fit(X_train_reshaped, y_train_reshaped, epochs=eps, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=0)

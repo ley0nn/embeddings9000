@@ -170,11 +170,6 @@ if __name__ == '__main__':
 	lstmPtc = args.ptc
 	reverse = args.rev
 
-	print(lstmTraining)
-	print(lstmOutput)
-	print(lstmTrainDev)
-	print(lstmCV)
-
 	TASK = 'binary'
 	#TASK = 'multi'
 
@@ -182,7 +177,7 @@ if __name__ == '__main__':
 	Preparing data
 	'''
 
-	print('Reading in ' + source + ' training data...' + dataSet)
+	print('Reading in ' + source + ' training data using ' + dataSet + 'dataset...')
 
 	IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK, reverse)
 
@@ -201,7 +196,7 @@ if __name__ == '__main__':
 		if testPath != '':
 			Xtest = helperFunctions.clean_samples_ruby(Xtest)
 
-	print(len(Xtrain), 'training samples!')
+	print(len(Xtrain), 'training samples after cleaning!')
 	'''
 	Preparing vectorizer and classifier
 	'''
@@ -219,7 +214,6 @@ if __name__ == '__main__':
 	else:
 		tokenizer = None
 
-		### TODO: define tokenizer for Reddit data
 
 	if ftr == 'ngram':
 		count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
@@ -228,7 +222,7 @@ if __name__ == '__main__':
 									('char', count_char)])
 
 	elif ftr == 'embeddings':
-		print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
+		# print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
 		embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
 		# glove_embeds = {}
 		if path_to_embs == glove_embeds_path:

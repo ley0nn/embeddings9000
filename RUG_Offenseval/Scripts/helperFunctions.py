@@ -213,6 +213,12 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
 
     elif dataSet == 'wikimedia':
         IDsTrain,Xtrain,Ytrain = read_corpus_wikimedia(trainPath,cls)
+
+    elif dataSet == 'other':
+        IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
+        if testPath == '../../english/agr_en_dev.csv':
+            IDsTest,Xtest,Ytest = read_corpus_otherSet(testPath,cls)
+
     else:
         IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
         ## TODO: implement reading function for the Reddit data
