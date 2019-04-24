@@ -105,7 +105,7 @@ class AttentionWithContext(Layer):
         return (input_shape[0], input_shape[-1],)
 
 
-def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv, eps, ptc, ds):
+def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv, eps, ptc, ds, vb, bs, prob):
     if training:
         y_train_reshaped = to_categorical(Ytrain, num_classes=2)
 
@@ -155,8 +155,8 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
         checkpoint = ModelCheckpoint(modelh5, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=ptc)
         callbacks_list = [checkpoint, es]
-        model.fit(X_train_reshaped, y_train_reshaped, epochs=eps, batch_size=64, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=0)
-        loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=0)
+        model.fit(X_train_reshaped, y_train_reshaped, epochs=eps, batch_size=bs, validation_data=(X_test_reshaped, y_test_reshaped), callbacks=callbacks_list, verbose=vb)
+        loss, accuracy = model.evaluate(X_test_reshaped, y_test_reshaped, verbose=vb)
 
         print("Done training")
 
@@ -201,9 +201,9 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
             checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
             es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=ptc)
             callbacks_list = [checkpoint,es]
-            model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=eps, validation_data=(X_train_reshaped[test], y_train_reshaped[test]), batch_size=64, callbacks=callbacks_list, verbose=0)
+            model.fit(X_train_reshaped[train], y_train_reshaped[train], epochs=eps, validation_data=(X_train_reshaped[test], y_train_reshaped[test]), batch_size=bs, callbacks=callbacks_list, verbose=vb)
             # evaluate the model
-            scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=0)
+            scores = model.evaluate(X_train_reshaped[test], y_train_reshaped[test], verbose=vb)
             print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
             cvscores.append(scores[1] * 100)
         print("%.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
