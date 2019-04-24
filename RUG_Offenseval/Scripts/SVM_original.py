@@ -144,11 +144,14 @@ if __name__ == '__main__':
 	parser.add_argument('-cln', type=str, help='clean')
 	parser.add_argument('-eps', type=int, help='epochs')
 	parser.add_argument('-ptc', type=int, help='patience')
+	parser.add_argument('-vb', type=int, help='verbose')
+	parser.add_argument('-bs', type=int, help='batch_size')
 	parser.add_argument('-rev', type=helperFunctions.str2bool, help='reverse 3vs1')
 	parser.add_argument('-lstmTrn', type=helperFunctions.str2bool, help='bilstm training True/False')
 	parser.add_argument('-lstmOp', type=helperFunctions.str2bool, help='bilstm output True/False')
 	parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
 	parser.add_argument('-lstmCV', type=helperFunctions.str2bool, help='bilstm cv True/False')
+	parser.add_argument('-lstmPrb', type=helperFunctions.str2bool, help='bilstm yguess_output True/False')
 	args = parser.parse_args()
 
 	source = args.src
@@ -169,6 +172,9 @@ if __name__ == '__main__':
 	lstmEps = args.eps
 	lstmPtc = args.ptc
 	reverse = args.rev
+	vb = args.vb
+	bs = args.bs
+	prob = args.lstmPrb
 
 	TASK = 'binary'
 	#TASK = 'multi'
@@ -255,7 +261,7 @@ if __name__ == '__main__':
 		print('Train labels', set(Ytrain), len(Ytrain))
 		print('Test labels', set(Ytest), len(Ytest))
 		print(cls)
-		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc, dataSet)
+		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc, dataSet, vb, bs, prob)
 
 
 	# Set up SVM classifier with unbalanced class weights
