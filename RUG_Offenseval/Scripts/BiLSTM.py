@@ -220,7 +220,8 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
         model = load_model(modelh5, custom_objects={'AttentionWithContext': AttentionWithContext})
         print("Model loaded! Processing data...")
 
-        max_length = max([len(s) for s in Xtrain + Xtest])
+        # max_length = max([len(s) for s in Xtrain + Xtest])
+        max_length = max([len(s) for s in Xtest])
         print('max_length: ', max_length)
         datalist_reshaped = t.texts_to_sequences(Xtest)
         datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')#maxlen=851,

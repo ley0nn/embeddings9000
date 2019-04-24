@@ -128,8 +128,10 @@ def ntlktokenizer(x):
 
 	return ' '.join(tokens)
 
-if __name__ == '__main__':
+def main():
+# def main(ftr, path_to_embs):
 # python3 SVM_original.py -src '' -ftr 'embeddings' -cls 'bilstm' -ds 'WaseemHovy' -mh5 'models/CVWaseem_reddit_general_ruby_weights-improvement-{epoch:02d}-{loss:.2f}.h5' -tknzr 'models/CVWaseem_tokenizer.pickle' -trnp '../../Full_Tweets_June2016_Dataset.csv' -tstp '' -pte '../../embeddings/reddit_general_ruby.txt' -evlt '' -cln 'none'
+
 	parser = argparse.ArgumentParser(description='ALW')
 	parser.add_argument('-src', type=str, help='source')
 	parser.add_argument('-ftr', type=str, help='ftr')
@@ -314,8 +316,19 @@ if __name__ == '__main__':
 		print('sourc: {} - datas: {}'.format(source, dataSet))
 
 
-
-
+if __name__ == '__main__':
+	main()
+	# main('ngram', '../../embeddings/reddit_general_ruby.txt')
+	#
+	# main('embeddings', '../../embeddings/reddit_general_ruby.txt')
+	# main('embeddings', '../../embeddings/reddit_polarised_ruby.txt')
+	# main('embeddings', '../../embeddings/twitter_polarised_2016.txt')
+	# main('embeddings', '../../embeddings/glove.twitter.27B.200d.txt')
+	#
+	# main('embeddings+ngram', '../../embeddings/reddit_general_ruby.txt')
+	# main('embeddings+ngram', '../../embeddings/reddit_polarised_ruby.txt')
+	# main('embeddings+ngram', '../../embeddings/twitter_polarised_2016.txt')
+	# main('embeddings+ngram', '../../embeddings/glove.twitter.27B.200d.txt')
 
 
 	#######
