@@ -90,7 +90,7 @@ from sklearn.base import TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import KFold, cross_validate
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.utils import shuffle
 
@@ -262,14 +262,16 @@ if __name__ == '__main__':
 	if TASK == 'binary' and cls != 'bilstm':
 		# cl_weights_binary = None
 		cl_weights_binary = {'NOT':1/nonOffensiveRatio, 'OFF':1/offensiveRatio}
-		clf = LinearSVC(class_weight=cl_weights_binary)
+		clf = LinearSVC(class_weight=cl_weights_binary, random_state=1337)
+		# clf = SVC(kernel='linear', probability=True, random_state=1337)
 	elif TASK == 'multi':
 		# cl_weights_multi = None
 		cl_weights_multi = {'OTHER':0.5,
 							'ABUSE':3,
 							'INSULT':3,
 							'PROFANITY':4}
-		clf = LinearSVC(class_weight=cl_weights_multi)
+		clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
+		# clf = SVC(kernel='linear', probability=True, random_state=1337)
 
 	if cls != 'bilstm':
 		classifier = Pipeline([
