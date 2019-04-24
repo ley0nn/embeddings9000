@@ -255,7 +255,7 @@ if __name__ == '__main__':
 		print('Train labels', set(Ytrain), len(Ytrain))
 		print('Test labels', set(Ytest), len(Ytest))
 		print(cls)
-		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc)
+		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc, dataSet)
 
 
 	# Set up SVM classifier with unbalanced class weights

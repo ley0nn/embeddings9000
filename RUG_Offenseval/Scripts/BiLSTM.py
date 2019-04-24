@@ -105,7 +105,7 @@ class AttentionWithContext(Layer):
         return (input_shape[0], input_shape[-1],)
 
 
-def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv, eps, ptc):
+def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tknzr, modelh5, cv, eps, ptc, ds):
     if training:
         y_train_reshaped = to_categorical(Ytrain, num_classes=2)
 
@@ -232,9 +232,10 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
         yguess = [str(item) for item in yguess]
         Ytest = [str(item) for item in Ytest]
 
-        # with open('yguess_BiLSTM_' + task + '.txt', 'w+') as yguess_output:
-        #     for line in yguess:
-        #         yguess_output.write('%s\n' % line)
+        # if prob:
+            # with open('yguess_BiLSTM_' + ds + '.txt', 'w+') as yguess_output:
+            #     for line in yguess:
+            #         yguess_output.write('%s\n' % line)
 
         accuracy = accuracy_score(Ytest, yguess)
         precision, recall, f1score, support = precision_recall_fscore_support(Ytest, yguess, average="weighted")
