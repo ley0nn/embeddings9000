@@ -21,10 +21,10 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 # dataSet = 'waseem_standard_wikimedia_otherVSstackoverflow'
 # dataSet = 'waseem_standard_wikimedia_otherVSstandardTest_otherTest'
 
-# dataSet = 'other'
-# dataSet = 'standard'
-# dataSet = 'WaseemHovy'
-# dataSet = 'wikimedia'
+# dataSet = 'other' #cyberbullying
+# dataSet = 'standard'  #Hatespeech 1/0
+# dataSet = 'WaseemHovy'    #racism/sexism
+# dataSet = 'wikimedia' #
 
 # modelh5 = 'models/B2_model.h5'            #reddit_general + semeval
 # modelh5 = 'models/B3_model.h5'          #reddit_polarised + semeval
@@ -109,232 +109,238 @@ np.random.seed(seed)
 
 
 MWET = MWETokenizer([   ('<', 'url', '>'),
-						('<', 'user', '>'),
-						('<', 'smile', '>'),
-						('<', 'lolface', '>'),
-						('<', 'sadface', '>'),
-						('<', 'neutralface', '>'),
-						('<', 'heart', '>'),
-						('<', 'number', '>'),
-						('<', 'hashtag', '>'),
-						('<', 'allcaps', '>'),
-						('<', 'repeat', '>'),
-						('<', 'elong', '>'),
-					], separator='')
+                        ('<', 'user', '>'),
+                        ('<', 'smile', '>'),
+                        ('<', 'lolface', '>'),
+                        ('<', 'sadface', '>'),
+                        ('<', 'neutralface', '>'),
+                        ('<', 'heart', '>'),
+                        ('<', 'number', '>'),
+                        ('<', 'hashtag', '>'),
+                        ('<', 'allcaps', '>'),
+                        ('<', 'repeat', '>'),
+                        ('<', 'elong', '>'),
+                    ], separator='')
 
 def ntlktokenizer(x):
-	tokens = word_tokenize(x)           # tokenize
-	tokens = MWET.tokenize(tokens)      # fix <url> and <user> etc.
+    tokens = word_tokenize(x)           # tokenize
+    tokens = MWET.tokenize(tokens)      # fix <url> and <user> etc.
 
-	return ' '.join(tokens)
+    return ' '.join(tokens)
 
 def main():
 # def main(ftr, path_to_embs):
 # python3 SVM_original.py -src '' -ftr 'embeddings' -cls 'bilstm' -ds 'WaseemHovy' -mh5 'models/CVWaseem_reddit_general_ruby_weights-improvement-{epoch:02d}-{loss:.2f}.h5' -tknzr 'models/CVWaseem_tokenizer.pickle' -trnp '../../Full_Tweets_June2016_Dataset.csv' -tstp '' -pte '../../embeddings/reddit_general_ruby.txt' -evlt '' -cln 'none'
 
-	parser = argparse.ArgumentParser(description='ALW')
-	parser.add_argument('-src', type=str, help='source')
-	parser.add_argument('-ftr', type=str, help='ftr')
-	parser.add_argument('-cls', type=str, help='cls')
-	parser.add_argument('-ds', type=str, help='dataSet')
-	parser.add_argument('-mh5', type=str, help='modelh5')
-	parser.add_argument('-tknzr', type=str, help='tknzr')
-	parser.add_argument('-trnp', type=str, help='trainPath')
-	parser.add_argument('-tstp', type=str, help='testPath')
-	parser.add_argument('-pte', type=str, help='path_to_embs')
-	parser.add_argument('-evlt', type=str, help='evlt')
-	parser.add_argument('-cln', type=str, help='clean')
-	parser.add_argument('-eps', type=int, help='epochs')
-	parser.add_argument('-ptc', type=int, help='patience')
-	parser.add_argument('-vb', type=int, help='verbose')
-	parser.add_argument('-bs', type=int, help='batch_size')
-	parser.add_argument('-rev', type=helperFunctions.str2bool, help='reverse 3vs1')
-	parser.add_argument('-lstmTrn', type=helperFunctions.str2bool, help='bilstm training True/False')
-	parser.add_argument('-lstmOp', type=helperFunctions.str2bool, help='bilstm output True/False')
-	parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
-	parser.add_argument('-lstmCV', type=helperFunctions.str2bool, help='bilstm cv True/False')
-	parser.add_argument('-lstmPrb', type=helperFunctions.str2bool, help='bilstm yguess_output True/False')
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='ALW')
+    parser.add_argument('-src', type=str, help='source')
+    parser.add_argument('-ftr', type=str, help='ftr')
+    parser.add_argument('-cls', type=str, help='cls')
+    parser.add_argument('-ds', type=str, help='dataSet')
+    parser.add_argument('-mh5', type=str, help='modelh5')
+    parser.add_argument('-tknzr', type=str, help='tknzr')
+    parser.add_argument('-trnp', type=str, help='trainPath')
+    parser.add_argument('-tstp', type=str, help='testPath')
+    parser.add_argument('-pte', type=str, help='path_to_embs')
+    parser.add_argument('-evlt', type=str, help='evlt')
+    parser.add_argument('-cln', type=str, help='clean')
+    parser.add_argument('-eps', type=int, help='epochs')
+    parser.add_argument('-ptc', type=int, help='patience')
+    parser.add_argument('-vb', type=int, help='verbose')
+    parser.add_argument('-bs', type=int, help='batch_size')
+    parser.add_argument('-rev', type=helperFunctions.str2bool, help='reverse 3vs1')
+    parser.add_argument('-lstmTrn', type=helperFunctions.str2bool, help='bilstm training True/False')
+    parser.add_argument('-lstmOp', type=helperFunctions.str2bool, help='bilstm output True/False')
+    parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
+    parser.add_argument('-lstmCV', type=helperFunctions.str2bool, help='bilstm cv True/False')
+    parser.add_argument('-prb', type=helperFunctions.str2bool, help='yguess_output/probabilities True/False')
+    args = parser.parse_args()
 
-	source = args.src
-	ftr = args.ftr
-	cls = args.cls
-	dataSet = args.ds
-	modelh5 = args.mh5
-	tknzr = args.tknzr
-	trainPath = args.trnp
-	testPath = args.tstp
-	path_to_embs = args.pte
-	evlt = args.evlt
-	clean = args.cln
-	lstmTraining = args.lstmTrn
-	lstmOutput = args.lstmOp
-	lstmTrainDev = args.lstmTd
-	lstmCV = args.lstmCV
-	lstmEps = args.eps
-	lstmPtc = args.ptc
-	reverse = args.rev
-	vb = args.vb
-	bs = args.bs
-	prob = args.lstmPrb
+    source = args.src
+    ftr = args.ftr
+    cls = args.cls
+    dataSet = args.ds
+    modelh5 = args.mh5
+    tknzr = args.tknzr
+    trainPath = args.trnp
+    testPath = args.tstp
+    path_to_embs = args.pte
+    evlt = args.evlt
+    clean = args.cln
+    lstmTraining = args.lstmTrn
+    lstmOutput = args.lstmOp
+    lstmTrainDev = args.lstmTd
+    lstmCV = args.lstmCV
+    lstmEps = args.eps
+    lstmPtc = args.ptc
+    reverse = args.rev
+    vb = args.vb
+    bs = args.bs
+    prob = args.prb
 
-	TASK = 'binary'
-	#TASK = 'multi'
+    TASK = 'binary'
+    #TASK = 'multi'
 
-	'''
-	Preparing data
-	'''
+    '''
+    Preparing data
+    '''
 
-	print('Reading in ' + source + ' training data using ' + dataSet + 'dataset...')
+    print('Reading in ' + source + ' training data using ' + dataSet + 'dataset...')
 
-	IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK, reverse)
-
-
-	print('Done reading in data...')
-
-	offensiveRatio = Ytrain.count('OFF')/len(Ytrain)
-	nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
-
-	# Minimal preprocessing / cleaning
-
-	if clean == 'std':
-		Xtrain = helperFunctions.clean_samples(Xtrain)
-	if clean == 'ruby':
-		Xtrain = helperFunctions.clean_samples_ruby(Xtrain)
-		if testPath != '':
-			Xtest = helperFunctions.clean_samples_ruby(Xtest)
-
-	print(len(Xtrain), 'training samples after cleaning!')
-	'''
-	Preparing vectorizer and classifier
-	'''
-
-	# Vectorizing data / Extracting features
-	print('Preparing tools (vectorizer, classifier) ...')
-
-	# unweighted word uni and bigrams
-	### This gives the stop_words may be inconsistent warning
-	if source == 'Twitter':
-		tokenizer = TweetTokenizer().tokenize
-	elif source == 'Reddit':
-		# tokenizer = None
-		tokenizer = ntlktokenizer
-	else:
-		tokenizer = None
+    IDsTrain, Xtrain, Ytrain, IDsTest, Xtest, Ytest = helperFunctions.loaddata(dataSet, trainPath, testPath, cls, TASK, reverse)
 
 
-	if ftr == 'ngram':
-		count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
-		count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
-		vectorizer = FeatureUnion([ ('word', count_word),
-									('char', count_char)])
+    print('Done reading in data...')
 
-	elif ftr == 'embeddings':
-		# print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
-		embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
-		# glove_embeds = {}
-		if path_to_embs == glove_embeds_path:
-			glove_embeds = embeddings
-		else:
-			glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
-		print('Done')
-		vectorizer = features.Embeddings(embeddings, glove_embeds, pool='max')
+    offensiveRatio = Ytrain.count('OFF')/len(Ytrain)
+    nonOffensiveRatio = Ytrain.count('NOT')/len(Ytrain)
 
-	elif ftr == 'embeddings+ngram':
-		count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
-		count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
-		# path_to_embs = 'embeddings/model_reset_random.bin'
-		print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
-		embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
-		# glove_embeds = {}
-		if path_to_embs == glove_embeds_path:
-			glove_embeds = embeddings
-		else:
-			glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
-		print('Done')
-		vectorizer = FeatureUnion([ ('word', count_word),
-									('char', count_char),
-									('word_embeds', features.Embeddings(embeddings, glove_embeds, pool='max'))])
+    # Minimal preprocessing / cleaning
 
-	if cls == 'bilstm':
-		from BiLSTM import biLSTM
-		if lstmTrainDev:
-			Xtrain, Xtest, Ytrain, Ytest = train_test_split(Xtrain, Ytrain, test_size=0.33, random_state=seed)
-		print('Train labels', set(Ytrain), len(Ytrain))
-		print('Test labels', set(Ytest), len(Ytest))
-		print(cls)
-		Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc, dataSet, vb, bs, prob)
+    if clean == 'std':
+        Xtrain = helperFunctions.clean_samples(Xtrain)
+    if clean == 'ruby':
+        Xtrain = helperFunctions.clean_samples_ruby(Xtrain)
+        if testPath != '':
+            Xtest = helperFunctions.clean_samples_ruby(Xtest)
+
+    print(len(Xtrain), 'training samples after cleaning!')
+    '''
+    Preparing vectorizer and classifier
+    '''
+
+    # Vectorizing data / Extracting features
+    print('Preparing tools (vectorizer, classifier) ...')
+
+    # unweighted word uni and bigrams
+    ### This gives the stop_words may be inconsistent warning
+    if source == 'Twitter':
+        tokenizer = TweetTokenizer().tokenize
+    elif source == 'Reddit':
+        # tokenizer = None
+        tokenizer = ntlktokenizer
+    else:
+        tokenizer = None
 
 
-	# Set up SVM classifier with unbalanced class weights
-	if TASK == 'binary' and cls != 'bilstm':
-		# cl_weights_binary = None
-		cl_weights_binary = {'NOT':1/nonOffensiveRatio, 'OFF':1/offensiveRatio}
-		clf = LinearSVC(class_weight=cl_weights_binary, random_state=1337)
-		# clf = SVC(kernel='linear', probability=True, random_state=1337)
-	elif TASK == 'multi':
-		# cl_weights_multi = None
-		cl_weights_multi = {'OTHER':0.5,
-							'ABUSE':3,
-							'INSULT':3,
-							'PROFANITY':4}
-		clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
-		# clf = SVC(kernel='linear', probability=True, random_state=1337)
+    if ftr == 'ngram':
+        count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
+        count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
+        vectorizer = FeatureUnion([ ('word', count_word),
+                                    ('char', count_char)])
 
-	if cls != 'bilstm':
-		classifier = Pipeline([
-								('vectorize', vectorizer),
-								('classify', clf)])
+    elif ftr == 'embeddings':
+        # print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
+        embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
+        # glove_embeds = {}
+        if path_to_embs == glove_embeds_path:
+            glove_embeds = embeddings
+        else:
+            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
+        print('Done')
+        vectorizer = features.Embeddings(embeddings, glove_embeds, pool='max')
+
+    elif ftr == 'embeddings+ngram':
+        count_word = CountVectorizer(ngram_range=(1,2), stop_words=stop_words.get_stop_words('en'), tokenizer=tokenizer)
+        count_char = CountVectorizer(analyzer='char', ngram_range=(3,7))
+        # path_to_embs = 'embeddings/model_reset_random.bin'
+        print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
+        embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
+        # glove_embeds = {}
+        if path_to_embs == glove_embeds_path:
+            glove_embeds = embeddings
+        else:
+            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
+        print('Done')
+        vectorizer = FeatureUnion([ ('word', count_word),
+                                    ('char', count_char),
+                                    ('word_embeds', features.Embeddings(embeddings, glove_embeds, pool='max'))])
+
+    if cls == 'bilstm':
+        from BiLSTM import biLSTM
+        if lstmTrainDev:
+            Xtrain, Xtest, Ytrain, Ytest = train_test_split(Xtrain, Ytrain, test_size=0.33, random_state=seed)
+        print('Train labels', set(Ytrain), len(Ytrain))
+        print('Test labels', set(Ytest), len(Ytest))
+        print(cls)
+        Ytest, Yguess = biLSTM(Xtrain, Ytrain, Xtest, Ytest, lstmTraining, lstmOutput, embeddings, tknzr, modelh5, lstmCV, lstmEps, lstmPtc, dataSet, vb, bs, prob)
+
+
+    # Set up SVM classifier with unbalanced class weights
+    if TASK == 'binary' and cls != 'bilstm':
+        # cl_weights_binary = None
+        cl_weights_binary = {'NOT':1/nonOffensiveRatio, 'OFF':1/offensiveRatio}
+        # clf = LinearSVC(class_weight=cl_weights_binary, random_state=1337)
+        clf = SVC(kernel='linear', probability=True, class_weight=cl_weights_binary, random_state=1337)
+    elif TASK == 'multi':
+        # cl_weights_multi = None
+        cl_weights_multi = {'OTHER':0.5,
+                            'ABUSE':3,
+                            'INSULT':3,
+                            'PROFANITY':4}
+        clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
+        # clf = SVC(kernel='linear', probability=True, random_state=1337)
+
+    if cls != 'bilstm':
+        classifier = Pipeline([
+                                ('vectorize', vectorizer),
+                                ('classify', clf)])
 
 
 
-	'''
-	Actual training and predicting:
-	'''
+    '''
+    Actual training and predicting:
+    '''
 
-	if evlt == 'cv10':
-		print('10-fold cross validation results:')
-		results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
-		# print(results)
-		print(sum(results['test_score']) / 10)
-		print('\n\nDone, used the following parameters:')
-		print('train: {}'.format(trainPath))
-		if ftr != 'ngram':
-			print('embed: {}'.format(path_to_embs))
-		print('feats: {}'.format(ftr))
-		print('prepr: {}'.format(clean))
-		print('sourc: {} - datas: {}'.format(source, dataSet))
-	elif evlt == 'traintest':
-		if cls != 'bilstm':
-			classifier.fit(Xtrain,Ytrain)
-			Yguess = classifier.predict(Xtest)
-		print('train test results:')
-		print(accuracy_score(Ytest, Yguess))
-		print(precision_recall_fscore_support(Ytest, Yguess, average='weighted'))
-		print(classification_report(Ytest, Yguess))
-		print('\n\nDone, used the following parameters:')
-		print('train: {}'.format(trainPath))
-		print('tests: {}'.format(testPath))
-		if ftr != 'ngram':
-			print('embed: {}'.format(path_to_embs))
-		print('feats: {}'.format(ftr))
-		print('prepr: {}'.format(clean))
-		print('sourc: {} - datas: {}'.format(source, dataSet))
+    if evlt == 'cv10':
+        print('10-fold cross validation results:')
+        results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
+        # print(results)
+        print(sum(results['test_score']) / 10)
+        print('\n\nDone, used the following parameters:')
+        print('train: {}'.format(trainPath))
+        if ftr != 'ngram':
+            print('embed: {}'.format(path_to_embs))
+        print('feats: {}'.format(ftr))
+        print('prepr: {}'.format(clean))
+        print('sourc: {} - datas: {}'.format(source, dataSet))
+    elif evlt == 'traintest':
+        if cls != 'bilstm':
+            classifier.fit(Xtrain,Ytrain)
+            Yguess = classifier.predict(Xtest)
+        print('train test results:')
+        print(accuracy_score(Ytest, Yguess))
+        print(precision_recall_fscore_support(Ytest, Yguess, average='weighted'))
+        print(classification_report(Ytest, Yguess))
+        print('\n\nDone, used the following parameters:')
+        print('train: {}'.format(trainPath))
+        print('tests: {}'.format(testPath))
+        if ftr != 'ngram':
+            print('embed: {}'.format(path_to_embs))
+        print('feats: {}'.format(ftr))
+        print('prepr: {}'.format(clean))
+        print('sourc: {} - datas: {}'.format(source, dataSet))
 
+    if prob:
+        with open('yguess_SVC_' + dataSet + '.txt', 'w+') as yguess_output:
+            for i in classifier.predict_proba(Xtest):
+                yguess_output.write('%s\n' % i[1])
+        # print(classifier.predict_proba(Xtest))
+        # print(Yguess)
 
 if __name__ == '__main__':
-	main()
-	# main('ngram', '../../embeddings/reddit_general_ruby.txt')
-	#
-	# main('embeddings', '../../embeddings/reddit_general_ruby.txt')
-	# main('embeddings', '../../embeddings/reddit_polarised_ruby.txt')
-	# main('embeddings', '../../embeddings/twitter_polarised_2016.txt')
-	# main('embeddings', '../../embeddings/glove.twitter.27B.200d.txt')
-	#
-	# main('embeddings+ngram', '../../embeddings/reddit_general_ruby.txt')
-	# main('embeddings+ngram', '../../embeddings/reddit_polarised_ruby.txt')
-	# main('embeddings+ngram', '../../embeddings/twitter_polarised_2016.txt')
-	# main('embeddings+ngram', '../../embeddings/glove.twitter.27B.200d.txt')
+    main()
+    # main('ngram', '../../embeddings/reddit_general_ruby.txt')
+    #
+    # main('embeddings', '../../embeddings/reddit_general_ruby.txt')
+    # main('embeddings', '../../embeddings/reddit_polarised_ruby.txt')
+    # main('embeddings', '../../embeddings/twitter_polarised_2016.txt')
+    # main('embeddings', '../../embeddings/glove.twitter.27B.200d.txt')
+    #
+    # main('embeddings+ngram', '../../embeddings/reddit_general_ruby.txt')
+    # main('embeddings+ngram', '../../embeddings/reddit_polarised_ruby.txt')
+    # main('embeddings+ngram', '../../embeddings/twitter_polarised_2016.txt')
+    # main('embeddings+ngram', '../../embeddings/glove.twitter.27B.200d.txt')
 
 
-	#######
+    #######
