@@ -224,7 +224,13 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
         max_length = max([len(s) for s in Xtest])
         print('max_length: ', max_length)
         datalist_reshaped = t.texts_to_sequences(Xtest)
-        datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')#maxlen=851,
+        try:
+            datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')
+        except ValueError:
+            try:
+                datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=851, padding='post')
+            except ValueError:
+                datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=2337, padding='post')
 
         print("Data processed! Predicting values...")
         score = model.predict(datalist_reshaped)
