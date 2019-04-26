@@ -278,8 +278,8 @@ def main():
                             'ABUSE':3,
                             'INSULT':3,
                             'PROFANITY':4}
-        clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
-        # clf = SVC(kernel='linear', probability=True, random_state=1337)
+        # clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
+        clf = SVC(kernel='linear', class_weight=cl_weights_multi, probability=True, random_state=1337)
 
     if cls != 'bilstm':
         classifier = Pipeline([
@@ -322,7 +322,7 @@ def main():
         print('sourc: {} - datas: {}'.format(source, dataSet))
 
     if prob:
-        with open('yguess_SVC_' + dataSet + '.txt', 'w+') as yguess_output:
+        with open('probas_SVC_' + dataSet + '.txt', 'w+') as yguess_output:
             for i in classifier.predict_proba(Xtest):
                 yguess_output.write('%s\n' % i[1])
         # print(classifier.predict_proba(Xtest))
