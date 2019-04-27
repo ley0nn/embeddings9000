@@ -271,7 +271,7 @@ def main():
         # cl_weights_binary = None
         cl_weights_binary = {'NOT':1/nonOffensiveRatio, 'OFF':1/offensiveRatio}
         # clf = LinearSVC(class_weight=cl_weights_binary, random_state=1337)
-        clf = SVC(kernel='linear', probability=True, class_weight=cl_weights_binary, random_state=1337)
+        clf = SVC(kernel='linear', probability=True, class_weight=cl_weights_binary, random_state=seed)
     elif TASK == 'multi':
         # cl_weights_multi = None
         cl_weights_multi = {'OTHER':0.5,
@@ -279,7 +279,7 @@ def main():
                             'INSULT':3,
                             'PROFANITY':4}
         # clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
-        clf = SVC(kernel='linear', class_weight=cl_weights_multi, probability=True, random_state=1337)
+        clf = SVC(kernel='linear', class_weight=cl_weights_multi, probability=True, random_state=seed)
 
     if cls != 'bilstm':
         classifier = Pipeline([
@@ -294,9 +294,25 @@ def main():
 
     if evlt == 'cv10':
         print('10-fold cross validation results:')
-        results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
-        # print(results)
-        print(sum(results['test_score']) / 10)
+        kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+        for train_index, test_index in kfold.split(Xtrain, Ytrain):
+            X_train, X_test = Xtrain[train_index], Xtrain[test_index]
+            Y_train, Y_test = Ytrain[train_index], Ytrain[test_index]
+            classifier.fit(X_train,Y_train)
+            Yguess = classifier.predict(X_test)
+            acc += accuracy_score(Y_test, Yguess)
+            prec += precision_score(Y_test, Yguess, average='macro')
+            rec += recall_score(Y_test, Yguess, average='macro')
+            f1_list += f1_score(Y_test, Yguess, average='macro')
+        print('accuracy_score: {}'.format(acc / 10))
+        print('precision_score: {}'.format(prec / 10))
+        print('recall_score: {}'.format(rec / 10))
+        print('f1_score: {}'.format(f1 / 10))
+
+        # results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
+        # # print(results)
+        # print(sum(results['test_score']) / 10)
+
         print('\n\nDone, used the following parameters:')
         print('train: {}'.format(trainPath))
         if ftr != 'ngram':
@@ -310,7 +326,7 @@ def main():
             Yguess = classifier.predict(Xtest)
         print('train test results:')
         print(accuracy_score(Ytest, Yguess))
-        print(precision_recall_fscore_support(Ytest, Yguess, average='weighted'))
+        print(precision_recall_fscore_support(Ytest, Yguess, average='macro'))
         print(classification_report(Ytest, Yguess))
         print('\n\nDone, used the following parameters:')
         print('train: {}'.format(trainPath))
