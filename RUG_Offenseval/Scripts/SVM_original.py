@@ -56,8 +56,6 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 # testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
 
-# path_to_embs = '../../embeddings/reddit_general.txt'
-# path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
 # path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
@@ -103,6 +101,8 @@ from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
 import argparse
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
+
 
 seed = 1337
 np.random.seed(seed)
