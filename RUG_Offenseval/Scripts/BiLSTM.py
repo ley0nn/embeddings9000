@@ -226,16 +226,31 @@ def biLSTM(Xtrain, Ytrain, Xtest, Ytest, training, output, embeddings_index, tkn
         datalist_reshaped = t.texts_to_sequences(Xtest)
         try:
             datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')
+            print("Data processed! Predicting values...")
+            score = model.predict(datalist_reshaped)
+            yguess = np.argmax(score, axis=1)
+
         except ValueError:
             try:
-                datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=851, padding='post')
+                 max_length = max([len(s) for s in Xtrain + Xtest])
+                 datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=max_length, padding='post')
+                 print("Data processed! Predicting values...")
+                 score = model.predict(datalist_reshaped)
+                 yguess = np.argmax(score, axis=1)
+
             except ValueError:
-                datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=2337, padding='post')
+                try:
+                    datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=851, padding='post')
+                    print("Data processed! Predicting values...")
+                    score = model.predict(datalist_reshaped)
+                    yguess = np.argmax(score, axis=1)
 
-        print("Data processed! Predicting values...")
-        score = model.predict(datalist_reshaped)
-        yguess = np.argmax(score, axis=1)
-
+                except ValueError:
+                    datalist_reshaped = pad_sequences(datalist_reshaped, maxlen=2337, padding='post')
+                    print("Data processed! Predicting values...")
+                    score = model.predict(datalist_reshaped)
+                    yguess = np.argmax(score, axis=1)
+        
         yguess = [str(item) for item in yguess]
         Ytest = [str(item) for item in Ytest]
 
