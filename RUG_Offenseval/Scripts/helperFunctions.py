@@ -25,10 +25,20 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain,Xtrain,Ytrain = read_corpus_WaseemHovy(trainPath,cls)
         else:
             IDsTrain,Xtrain,Ytrain = read_corpus_WaseemHovy(trainPath,cls)
+
+    elif dataSet == 'wikimedia':
+        IDsTrain,Xtrain,Ytrain = read_corpus_wikimedia(trainPath,cls)
+
+    elif dataSet == 'other':
+        IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
+        if testPath == '../../english/agr_en_dev.csv':
+            IDsTest,Xtest,Ytest = read_corpus_otherSet(testPath,cls)
+
     elif dataSet == 'standard':
         IDsTrain,Xtrain,Ytrain = read_corpus(trainPath,cls)
         if testPath == '../../public_development_en/dev_en.tsv':
             IDsTest,Xtest,Ytest = read_corpus(testPath,cls)
+
     elif dataSet == 'other_waseem_standardVSwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
@@ -211,17 +221,12 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             Xtrain.append(x)
             Ytrain.append(y)
 
-    elif dataSet == 'wikimedia':
-        IDsTrain,Xtrain,Ytrain = read_corpus_wikimedia(trainPath,cls)
-
-    elif dataSet == 'other':
-        IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
-        if testPath == '../../english/agr_en_dev.csv':
-            IDsTest,Xtest,Ytest = read_corpus_otherSet(testPath,cls)
-
     else:
         IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
         ## TODO: implement reading function for the Reddit data
+
+    if testPath == '/data/s2548798/Leon/stackoverflow/StackOverflow/stack_comments.csv':
+        IDsTest,Xtest,Ytest = read_corpus_stackoverflow(testPath,cls)
 
     if reverse:
         tmp_id = IDsTest
