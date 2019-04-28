@@ -128,8 +128,8 @@ def ntlktokenizer(x):
 
     return ' '.join(tokens)
 
-def main():
-# def main(ftr, path_to_embs):
+# def main():
+def main(ftr, clean, path_to_embs):
 # python3 SVM_original.py -src '' -ftr 'embeddings' -cls 'bilstm' -ds 'WaseemHovy' -mh5 'models/CVWaseem_reddit_general_ruby_weights-improvement-{epoch:02d}-{loss:.2f}.h5' -tknzr 'models/CVWaseem_tokenizer.pickle' -trnp '../../Full_Tweets_June2016_Dataset.csv' -tstp '' -pte '../../embeddings/reddit_general_ruby.txt' -evlt '' -cln 'none'
 
     parser = argparse.ArgumentParser(description='ALW')
@@ -157,16 +157,16 @@ def main():
     args = parser.parse_args()
 
     source = args.src
-    ftr = args.ftr
+    # ftr = args.ftr            # LET OP: uitzetten als je main 9x aanroept
     cls = args.cls
     dataSet = args.ds
     modelh5 = args.mh5
     tknzr = args.tknzr
     trainPath = args.trnp
     testPath = args.tstp
-    path_to_embs = args.pte
+    # path_to_embs = args.pte   # LET OP: uitzetten als je main 9x aanroept
     evlt = args.evlt
-    clean = args.cln
+    # clean = args.cln          # LET OP: uitzetten als je main 9x aanroept
     lstmTraining = args.lstmTrn
     lstmOutput = args.lstmOp
     lstmTrainDev = args.lstmTd
@@ -345,18 +345,18 @@ def main():
         # print(Yguess)
 
 if __name__ == '__main__':
-    main()
-    # main('ngram', '../../embeddings/reddit_general_ruby.txt')
-    #
-    # main('embeddings', '../../embeddings/reddit_general_ruby.txt')
-    # main('embeddings', '../../embeddings/reddit_polarised_ruby.txt')
-    # main('embeddings', '../../embeddings/twitter_polarised_2016.txt')
-    # main('embeddings', '../../embeddings/glove.twitter.27B.200d.txt')
-    #
-    # main('embeddings+ngram', '../../embeddings/reddit_general_ruby.txt')
-    # main('embeddings+ngram', '../../embeddings/reddit_polarised_ruby.txt')
-    # main('embeddings+ngram', '../../embeddings/twitter_polarised_2016.txt')
-    # main('embeddings+ngram', '../../embeddings/glove.twitter.27B.200d.txt')
+    # main() # LET OP: uitzetten als je main 9x aanroept
+    main('ngram', 'none', '../../embeddings/reddit_general_ruby.txt')
+
+    main('embeddings', 'ruby', '../../embeddings/reddit_general_ruby.txt')
+    main('embeddings', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
+    main('embeddings', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
+    main('embeddings', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
+
+    main('embeddings+ngram', 'ruby', '../../embeddings/reddit_general_ruby.txt')
+    main('embeddings+ngram', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
+    main('embeddings+ngram', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
+    main('embeddings+ngram', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
 
 
     #######
