@@ -92,8 +92,8 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
                 Xtest.append(x)
                 Ytest.append(y)
 
-        elif testPath == '../../offensive.csv':
-            IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
+        # elif testPath == '../../offensive.csv':
+        #     IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
 
 
     elif dataSet == 'other_waseem_standardVSwikimedia':
@@ -519,7 +519,7 @@ def read_corpus_stackoverflow(corpus_file,cls):
     # shuffle(mapIndexPosition)
     # ids, tweets, labels = zip(*mapIndexPosition)
 
-    print("read " + str(len(tweets[1:])) + " tweets.")
+    print("read " + str(len(tweets)) + " tweets.")
     return ids, tweets, labels
 
 
