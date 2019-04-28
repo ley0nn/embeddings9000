@@ -152,6 +152,7 @@ def main(ftr, clean, path_to_embs):
     parser.add_argument('-lstmTd', type=helperFunctions.str2bool, help='bilstm traindev True/False')
     parser.add_argument('-lstmCV', type=helperFunctions.str2bool, help='bilstm cv True/False')
     parser.add_argument('-prb', type=helperFunctions.str2bool, help='yguess_output/probabilities True/False')
+    parser.add_argument('-cnct', type=helperFunctions.str2bool, help='concat')
     args = parser.parse_args()
 
     source = args.src
@@ -175,6 +176,7 @@ def main(ftr, clean, path_to_embs):
     vb = args.vb
     bs = args.bs
     prob = args.prb
+    concat = args.cnct
 
     TASK = 'binary'
     #TASK = 'multi'
@@ -234,10 +236,11 @@ def main(ftr, clean, path_to_embs):
         # print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         # glove_embeds = {}
-        if path_to_embs == glove_embeds_path:
-            glove_embeds = embeddings
-        else:
-            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
+        if concat:
+            if path_to_embs == glove_embeds_path:
+                glove_embeds = embeddings
+            else:
+                glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
         print('Done')
         vectorizer = features.Embeddings(embeddings, glove_embeds, pool='max')
 
@@ -248,10 +251,11 @@ def main(ftr, clean, path_to_embs):
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         # glove_embeds = {}
-        if path_to_embs == glove_embeds_path:
-            glove_embeds = embeddings
-        else:
-            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
+        if concat:
+            if path_to_embs == glove_embeds_path:
+                glove_embeds = embeddings
+            else:
+                glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
         print('Done')
         vectorizer = FeatureUnion([ ('word', count_word),
                                     ('char', count_char),
