@@ -56,8 +56,6 @@ original by Caselli et al: https://github.com/malvinanissim/germeval-rug
 # testPath = '../../public_development_en/dev_en.tsv'         # SemEval - standard
 # testPath = '../../english/agr_en_dev.csv'                    # Facebook english - other
 
-# path_to_embs = '../../embeddings/reddit_general.txt'
-# path_to_embs = '../../embeddings/reddit_polarised.txt'
 # path_to_embs = '../../embeddings/reddit_general_ruby.txt'
 # path_to_embs = '../../embeddings/reddit_polarised_ruby.txt'
 # path_to_embs = '../../embeddings/twitter_polarised_2016.txt'
@@ -103,6 +101,8 @@ from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
 import argparse
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
+
 
 seed = 1337
 np.random.seed(seed)
@@ -271,15 +271,15 @@ def main():
         # cl_weights_binary = None
         cl_weights_binary = {'NOT':1/nonOffensiveRatio, 'OFF':1/offensiveRatio}
         # clf = LinearSVC(class_weight=cl_weights_binary, random_state=1337)
-        clf = SVC(kernel='linear', probability=True, class_weight=cl_weights_binary, random_state=1337)
+        clf = SVC(kernel='linear', probability=True, class_weight=cl_weights_binary, random_state=seed)
     elif TASK == 'multi':
         # cl_weights_multi = None
         cl_weights_multi = {'OTHER':0.5,
                             'ABUSE':3,
                             'INSULT':3,
                             'PROFANITY':4}
-        clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
-        # clf = SVC(kernel='linear', probability=True, random_state=1337)
+        # clf = LinearSVC(class_weight=cl_weights_multi, random_state=1337)
+        clf = SVC(kernel='linear', class_weight=cl_weights_multi, probability=True, random_state=seed)
 
     if cls != 'bilstm':
         classifier = Pipeline([
@@ -294,9 +294,25 @@ def main():
 
     if evlt == 'cv10':
         print('10-fold cross validation results:')
-        results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
-        # print(results)
-        print(sum(results['test_score']) / 10)
+        kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+        for train_index, test_index in kfold.split(Xtrain, Ytrain):
+            X_train, X_test = Xtrain[train_index], Xtrain[test_index]
+            Y_train, Y_test = Ytrain[train_index], Ytrain[test_index]
+            classifier.fit(X_train,Y_train)
+            Yguess = classifier.predict(X_test)
+            acc += accuracy_score(Y_test, Yguess)
+            prec += precision_score(Y_test, Yguess, average='macro')
+            rec += recall_score(Y_test, Yguess, average='macro')
+            f1_list += f1_score(Y_test, Yguess, average='macro')
+        print('accuracy_score: {}'.format(acc / 10))
+        print('precision_score: {}'.format(prec / 10))
+        print('recall_score: {}'.format(rec / 10))
+        print('f1_score: {}'.format(f1 / 10))
+
+        # results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
+        # # print(results)
+        # print(sum(results['test_score']) / 10)
+
         print('\n\nDone, used the following parameters:')
         print('train: {}'.format(trainPath))
         if ftr != 'ngram':
@@ -310,7 +326,7 @@ def main():
             Yguess = classifier.predict(Xtest)
         print('train test results:')
         print(accuracy_score(Ytest, Yguess))
-        print(precision_recall_fscore_support(Ytest, Yguess, average='weighted'))
+        print(precision_recall_fscore_support(Ytest, Yguess, average='macro'))
         print(classification_report(Ytest, Yguess))
         print('\n\nDone, used the following parameters:')
         print('train: {}'.format(trainPath))
@@ -322,7 +338,7 @@ def main():
         print('sourc: {} - datas: {}'.format(source, dataSet))
 
     if prob:
-        with open('yguess_SVC_' + dataSet + '.txt', 'w+') as yguess_output:
+        with open('probas_SVC_' + dataSet + '.txt', 'w+') as yguess_output:
             for i in classifier.predict_proba(Xtest):
                 yguess_output.write('%s\n' % i[1])
         # print(classifier.predict_proba(Xtest))
