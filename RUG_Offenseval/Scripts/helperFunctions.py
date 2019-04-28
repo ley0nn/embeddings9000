@@ -92,7 +92,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
                 Xtest.append(x)
                 Ytest.append(y)
 
-        elif testPath = '../../offensive.csv':
+        elif testPath == '../../offensive.csv':
             IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
 
 
