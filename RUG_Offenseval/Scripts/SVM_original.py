@@ -235,7 +235,7 @@ def main(ftr, clean, path_to_embs):
     elif ftr == 'embeddings':
         # print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
-        # glove_embeds = {}
+        glove_embeds = {}
         if concat:
             if path_to_embs == glove_embeds_path:
                 glove_embeds = embeddings
@@ -250,7 +250,7 @@ def main(ftr, clean, path_to_embs):
         # path_to_embs = 'embeddings/model_reset_random.bin'
         print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
-        # glove_embeds = {}
+        glove_embeds = {}
         if concat:
             if path_to_embs == glove_embeds_path:
                 glove_embeds = embeddings
