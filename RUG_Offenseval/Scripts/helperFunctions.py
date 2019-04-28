@@ -92,6 +92,9 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
                 Xtest.append(x)
                 Ytest.append(y)
 
+        elif testPath = '../../offensive.csv':
+            IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
+
 
     elif dataSet == 'other_waseem_standardVSwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
@@ -241,7 +244,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             Ytest.append(y)
 
     elif dataSet == 'waseem_standard_wikimedia_otherVSstackoverflow':
-        IDsTest,Xtest,Ytest = read_corpus_stackoverflow('/data/s2548798/Leon/stackoverflow/StackOverflow/stack_comments.csv',cls)
+        IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
             IDsTrain.append(id)
@@ -279,7 +282,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
         IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
         ## TODO: implement reading function for the Reddit data
 
-    if testPath == '/data/s2548798/Leon/stackoverflow/StackOverflow/stack_comments.csv':
+    if testPath == '../../offensive.csv':
         IDsTest,Xtest,Ytest = read_corpus_stackoverflow(testPath,cls)
 
     if reverse:
@@ -432,6 +435,7 @@ def read_corpus_wikimedia(corpus_file, cls, binary=True):
 
 def read_corpus_stackoverflow(corpus_file,cls):
     '''Reading in data from corpus file'''
+    print('Reading StackOverflow data...')
 
     # Offensive = []
     # Unwelcoming = []
@@ -445,28 +449,28 @@ def read_corpus_stackoverflow(corpus_file,cls):
     tweets = []
     labels = []
     count = 0
-    outfile = open('offensive.csv', mode='w')
+    # outfile = open('offensive.csv', mode='w')
     with open(corpus_file) as csvfile:
         next(csvfile)
         readCSV = csv.reader(csvfile, delimiter=',')
         for line in readCSV:
             text = line[1]
             flag = line[2]
-            if len(line) < 3 or flag == 'NA':
-                continue
+            # if len(line) < 3 or flag == 'NA':
+            #     continue
 
             if cls == 'bilstm':
-                if flag == 'Comment Rude Or Offensive':
-                    labels.append(1)
-                    tweets.append(text)
-                    ids.append(count)
-                    count += 1
+                # if flag == 'Comment Rude Or Offensive':
+                labels.append(1)
+                tweets.append(text)
+                ids.append(count)
+                count += 1
             else:
-                if flag == 'Comment Rude Or Offensive':
-                    labels.append('OFF')
-                    tweets.append(text)
-                    ids.append(count)
-                    count += 1
+                # if flag == 'Comment Rude Or Offensive':
+                labels.append('OFF')
+                tweets.append(text)
+                ids.append(count)
+                count += 1
 
 
 
@@ -515,6 +519,7 @@ def read_corpus_stackoverflow(corpus_file,cls):
     # shuffle(mapIndexPosition)
     # ids, tweets, labels = zip(*mapIndexPosition)
 
+    print("read " + str(len(tweets[1:])) + " tweets.")
     return ids, tweets, labels
 
 
