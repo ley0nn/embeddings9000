@@ -92,10 +92,8 @@ from sklearn.svm import SVC, LinearSVC
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.utils import shuffle
 
-from sklearn.metrics import precision_recall_fscore_support, classification_report, accuracy_score
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from nltk.tokenize import TweetTokenizer, word_tokenize, MWETokenizer
 import argparse
@@ -233,10 +231,10 @@ def main(ftr, clean, path_to_embs):
         # print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         # glove_embeds = {}
-        if path_to_embs == glove_embeds_path:
-            glove_embeds = embeddings
-        else:
-            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
+        # # if path_to_embs == glove_embeds_path:
+        # #     glove_embeds = embeddings
+        # # else:
+        # #     glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
         print('Done')
         vectorizer = features.Embeddings(embeddings, glove_embeds, pool='max')
 
@@ -295,19 +293,30 @@ def main(ftr, clean, path_to_embs):
     if evlt == 'cv10':
         print('10-fold cross validation results:')
         kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+
+        Xtrain = np.array(Xtrain)
+        Ytrain = np.array(Ytrain)
+
+        accuracy = 0
+        precision = 0
+        recall = 0
+        fscore = 0
         for train_index, test_index in kfold.split(Xtrain, Ytrain):
             X_train, X_test = Xtrain[train_index], Xtrain[test_index]
             Y_train, Y_test = Ytrain[train_index], Ytrain[test_index]
+
             classifier.fit(X_train,Y_train)
             Yguess = classifier.predict(X_test)
-            acc += accuracy_score(Y_test, Yguess)
-            prec += precision_score(Y_test, Yguess, average='macro')
-            rec += recall_score(Y_test, Yguess, average='macro')
-            f1_list += f1_score(Y_test, Yguess, average='macro')
-        print('accuracy_score: {}'.format(acc / 10))
-        print('precision_score: {}'.format(prec / 10))
-        print('recall_score: {}'.format(rec / 10))
-        print('f1_score: {}'.format(f1 / 10))
+
+            accuracy += accuracy_score(Y_test, Yguess)
+            precision += precision_score(Y_test, Yguess, average='macro')
+            recall += recall_score(Y_test, Yguess, average='macro')
+            fscore += f1_score(Y_test, Yguess, average='macro')
+
+        print('accuracy_score: {}'.format(accuracy / 10))
+        print('precision_score: {}'.format(precision / 10))
+        print('recall_score: {}'.format(recall / 10))
+        print('f1_score: {}'.format(fscore / 10))
 
         # results = (cross_validate(classifier, Xtrain, Ytrain,cv=10, verbose=1))
         # # print(results)
