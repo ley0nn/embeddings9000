@@ -354,7 +354,7 @@ def main(ftr, clean, path_to_embs):
         print('sourc: {} - datas: {}'.format(source, dataSet))
 
     if prob:
-        with open('probas_SVC_' + dataSet + '_' + trainPath[6:-4] + '_' + path_to_embs[17:-4] + '_concat=' + str(concat) + '.txt', 'w+') as yguess_output:
+        with open('probas_SVC_' + dataSet + '_' + trainPath[6:-4] + '_' + ftr + '_' + path_to_embs[17:-4] + '_concat=' + str(concat) + '.txt', 'w+') as yguess_output:
             for i in classifier.predict_proba(Xtest):
                 yguess_output.write('%s\n' % i[1])
         # print(classifier.predict_proba(Xtest))
