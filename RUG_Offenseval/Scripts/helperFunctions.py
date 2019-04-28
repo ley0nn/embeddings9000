@@ -39,6 +39,60 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
         if testPath == '../../public_development_en/dev_en.tsv':
             IDsTest,Xtest,Ytest = read_corpus(testPath,cls)
 
+    elif dataSet == 'cross':
+        ''' load train data '''
+
+        if trainPath == '../../Full_Tweets_June2016_Dataset.csv':
+            IDsTrain,Xtrain,Ytrain = read_corpus_WaseemHovy(trainPath,cls)
+
+        elif trainPath == '../../4563973/toxicity_annotated_comments.tsv':
+            IDsTrain,Xtrain,Ytrain = read_corpus_wikimedia(trainPath,cls)
+
+        elif trainPath == '../../public_development_en/train_en.tsv':
+            IDsTrain,Xtrain,Ytrain = read_corpus(trainPath,cls)
+            # Also add SemEval dev-data
+            IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+            for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+                IDsTrain.append(id)
+                Xtrain.append(x)
+                Ytrain.append(y)
+
+        elif trainPath == '../../english/agr_en_train.csv':
+            IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
+            # Also add Facebook dev-data
+            IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+            for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+                IDsTrain.append(id)
+                Xtrain.append(x)
+                Ytrain.append(y)
+
+        ''' load test data '''
+
+        if testPath == '../../Full_Tweets_June2016_Dataset.csv':
+            IDsTest,Xtest,Ytest = read_corpus_WaseemHovy(testPath,cls)
+
+        elif testPath == '../../4563973/toxicity_annotated_comments.tsv':
+            IDsTest,Xtest,Ytest = read_corpus_wikimedia(testPath,cls)
+
+        elif testPath == '../../public_development_en/train_en.tsv':
+            IDsTest,Xtest,Ytest = read_corpus(testPath,cls)
+            # Also add SemEval dev-data
+            IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+            for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+                IDsTest.append(id)
+                Xtest.append(x)
+                Ytest.append(y)
+
+        elif testPath == '../../english/agr_en_train.csv':
+            IDsTest,Xtest,Ytest = read_corpus_otherSet(testPath,cls)
+            # Also add Facebook dev-data
+            IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+            for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+                IDsTest.append(id)
+                Xtest.append(x)
+                Ytest.append(y)
+
+
     elif dataSet == 'other_waseem_standardVSwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
@@ -244,6 +298,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
 
 def read_corpus_otherSet(corpus_file, cls, binary=True): #Facebook Enlgish
     '''Reading in data from corpus file'''
+    print('Reading Facebook cyberbullying data...')
     with open(corpus_file, 'r', encoding='utf-8') as fi:
         fi = fi.readlines()
         ids = []
@@ -286,6 +341,7 @@ def read_corpus_otherSet(corpus_file, cls, binary=True): #Facebook Enlgish
 
 def read_corpus_WaseemHovy(corpus_file,cls):
     '''Reading in data from corpus file'''
+    print('Reading WaseemHovy data...')
     ids = []
     tweets = []
     labels = []
@@ -313,10 +369,12 @@ def read_corpus_WaseemHovy(corpus_file,cls):
     shuffle(mapIndexPosition)
     ids, tweets, labels = zip(*mapIndexPosition)
 
+    print("read " + str(len(tweets)) + " tweets.")
     return ids, tweets, labels
 
 def read_corpus(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
+    print('Reading HatEval data...')
     ids = []
     tweets = []
     labels = []
@@ -340,11 +398,13 @@ def read_corpus(corpus_file, cls, binary=True):
                 elif data[2] == '0':
                     labels.append('NOT')
 
+    print("read " + str(len(tweets[1:])) + " tweets.")
     return ids[1:], tweets[1:], labels
 
 
 def read_corpus_wikimedia(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
+    print('Reading Wikimedia data...')
     if cls == 'bilstm':
         label_dict = {True: 1, False: 0}
     else:
@@ -366,6 +426,7 @@ def read_corpus_wikimedia(corpus_file, cls, binary=True):
     tweets = list(comments['comment'])
     labels = list(comments['toxicity_score'])
 
+    print("read " + str(len(tweets)) + " tweets.")
     return ids, tweets, labels
 
 
@@ -384,7 +445,7 @@ def read_corpus_stackoverflow(corpus_file,cls):
     tweets = []
     labels = []
     count = 0
-
+    outfile = open('offensive.csv', mode='w')
     with open(corpus_file) as csvfile:
         next(csvfile)
         readCSV = csv.reader(csvfile, delimiter=',')
@@ -406,6 +467,8 @@ def read_corpus_stackoverflow(corpus_file,cls):
                     tweets.append(text)
                     ids.append(count)
                     count += 1
+
+
 
             # elif flag == 'CommentUnwelcoming':
             #     Unwelcoming.append(text)

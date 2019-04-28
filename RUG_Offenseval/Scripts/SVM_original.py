@@ -203,6 +203,9 @@ def main(ftr, clean, path_to_embs):
             Xtest = helperFunctions.clean_samples_ruby(Xtest)
 
     print(len(Xtrain), 'training samples after cleaning!')
+    if Xtest:
+        print(len(Xtest), 'testing samples after cleaning!')
+
     '''
     Preparing vectorizer and classifier
     '''
@@ -231,10 +234,10 @@ def main(ftr, clean, path_to_embs):
         # print('Getting pretrained word embeddings from {}...'.format(path_to_embs))
         embeddings, vocab = helperFunctions.load_embeddings(path_to_embs)
         # glove_embeds = {}
-        # # if path_to_embs == glove_embeds_path:
-        # #     glove_embeds = embeddings
-        # # else:
-        # #     glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
+        if path_to_embs == glove_embeds_path:
+            glove_embeds = embeddings
+        else:
+            glove_embeds, glove_vocab = helperFunctions.load_embeddings(glove_embeds_path)
         print('Done')
         vectorizer = features.Embeddings(embeddings, glove_embeds, pool='max')
 
@@ -355,17 +358,17 @@ def main(ftr, clean, path_to_embs):
 
 if __name__ == '__main__':
     # main() # LET OP: uitzetten als je main 9x aanroept
-    main('ngram', 'none', '../../embeddings/reddit_general_ruby.txt')
+    # main('ngram', 'none', '../../embeddings/reddit_general_ruby.txt')
 
     main('embeddings', 'ruby', '../../embeddings/reddit_general_ruby.txt')
-    main('embeddings', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
-    main('embeddings', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
-    main('embeddings', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
-
-    main('embeddings+ngram', 'ruby', '../../embeddings/reddit_general_ruby.txt')
-    main('embeddings+ngram', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
-    main('embeddings+ngram', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
-    main('embeddings+ngram', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
+    # main('embeddings', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
+    # main('embeddings', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
+    # main('embeddings', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
+    #
+    # main('embeddings+ngram', 'ruby', '../../embeddings/reddit_general_ruby.txt')
+    # main('embeddings+ngram', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
+    # main('embeddings+ngram', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
+    # main('embeddings+ngram', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
 
 
     #######
