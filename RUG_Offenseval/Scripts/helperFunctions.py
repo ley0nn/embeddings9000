@@ -36,8 +36,19 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
 
     elif dataSet == 'standard':
         IDsTrain,Xtrain,Ytrain = read_corpus(trainPath,cls)
-        if testPath == '../../public_development_en/dev_en.tsv':
+        # Also add SemEval dev-data
+        IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+        for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        if testPath == '../../public_development_en/test_en.tsv':
             IDsTest,Xtest,Ytest = read_corpus(testPath,cls)
+
+    elif dataSet == 'offenseval':
+        IDsTrain,Xtrain,Ytrain = read_corpus_offensevalTRAIN(trainPath,cls)
+        if testPath == '../../OLIDv1.0/testset-levela.tsv':
+            IDsTest,Xtest,Ytest = read_corpus_offensevalTEST(testPath,cls)
 
     elif dataSet == 'cross':
         ''' load train data '''
@@ -95,7 +106,80 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
         # elif testPath == '../../offensive.csv':
         #     IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
 
+###             2vs1            ###
+    elif dataSet == 'standard_waseemVSother':
+        IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
+        for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Also add SemEval dev-data
+        IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+        for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+        for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+        IDsTest2,Xtest2,Ytest2 = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+        for id,x,y in zip(IDsTest2,Xtest2,Ytest2):
+            IDsTest.append(id)
+            Xtest.append(x)
+            Ytest.append(y)
+    elif dataSet == 'other_standardVSwaseem':
+        IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+        for id,x,y in zip(IDsOther,Xother,Yother):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Also add Facebook dev-data
+        IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+        for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
+        for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Also add SemEval dev-data
+        IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+        for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+    elif dataSet == 'other_waseemVSstandard':
+        IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+        for id,x,y in zip(IDsOther,Xother,Yother):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Also add Facebook dev-data
+        IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+        for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+        for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        IDsTest,Xtest,Ytest = read_corpus('../../public_development_en/train_en.tsv',cls)
+        # Also add SemEval dev-data
+        IDsTest2,Xtest2,Ytest2 = read_corpus('../../public_development_en/dev_en.tsv',cls)
+        for id,x,y in zip(IDsTest2,Xtest2,Ytest2):
+            IDsTest.append(id)
+            Xtest.append(x)
+            Ytest.append(y)
 
+###             3vs1            ###
     elif dataSet == 'other_waseem_standardVSwikimedia':
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
@@ -375,6 +459,69 @@ def read_corpus_WaseemHovy(corpus_file,cls):
     print("read " + str(len(tweets)) + " tweets.")
     return ids, tweets, labels
 
+def read_corpus_offensevalTRAIN(corpus_file, cls, binary=True):
+    '''Reading in data from corpus file'''
+    print('Reading OffensEvalTRAIN data...')
+    ids = []
+    tweets = []
+    labels = []
+    with open(corpus_file, 'r', encoding='utf-8') as fi:
+        for line in fi:
+            data = line.strip().split('\t')
+            # making sure no missing labels
+            if len(data) != 5:
+                raise IndexError('Missing data for tweet "%s"' % data[0])
+
+            ids.append(data[0])
+            tweets.append(data[1])
+            if cls == 'bilstm':
+                if data[2] == 'OFF':
+                    labels.append(1)
+                elif data[2] == 'NOT':
+                    labels.append(0)
+            else:
+                if data[2] == 'OFF':
+                    labels.append('OFF')
+                elif data[2] == 'NOT':
+                    labels.append('NOT')
+
+    print("read " + str(len(tweets[1:])) + " tweets.")
+    return ids[1:], tweets[1:], labels
+
+def read_corpus_offensevalTEST(corpus_file, cls, binary=True):
+    '''Reading in data from corpus file'''
+    print('Reading OffensEvalTEST data...')
+    ids = []
+    tweets = []
+    labels = []
+    with open(corpus_file, 'r', encoding='utf-8') as fi:
+        for line in fi:
+            data = line.strip().split('\t')
+            # making sure no missing labels
+            if len(data) != 2:
+                raise IndexError('Missing data for tweet "%s"' % data[0])
+
+            ids.append(data[0])
+            tweets.append(data[1])
+    with open('../../OLIDv1.0/labels-levela.csv', 'r', encoding='ISO-8859-1') as fi2:
+        for line in fi2:
+            data = line.strip().split(',')
+            if len(data)<2:
+                continue
+            if cls == 'bilstm':
+                if data[1] == 'NOT':
+                    labels.append(0)
+                elif data[1] == 'OFF':
+                    labels.append(1)
+            else:
+                if data[1] == 'NOT':
+                    labels.append('NOT')
+                elif data[1] == 'OFF':
+                    labels.append('OFF')
+
+    print("read " + str(len(tweets[1:])) + " tweets.")
+    return ids[1:], tweets[1:], labels
+
 def read_corpus(corpus_file, cls, binary=True):
     '''Reading in data from corpus file'''
     print('Reading HatEval data...')
@@ -401,8 +548,12 @@ def read_corpus(corpus_file, cls, binary=True):
                 elif data[2] == '0':
                     labels.append('NOT')
 
-    print("read " + str(len(tweets[1:])) + " tweets.")
-    return ids[1:], tweets[1:], labels
+    if corpus_file == '../../public_development_en/test_en.tsv':
+        print("read " + str(len(tweets[1:])) + " tweets.")
+        return ids, tweets, labels
+    else:
+        print("read " + str(len(tweets[1:])) + " tweets.")
+        return ids[1:], tweets[1:], labels
 
 
 def read_corpus_wikimedia(corpus_file, cls, binary=True):
