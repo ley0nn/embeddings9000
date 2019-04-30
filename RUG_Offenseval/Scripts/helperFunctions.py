@@ -180,12 +180,14 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             Ytest.append(y)
 
 ###             3vs1            ###
-    elif dataSet == 'other_waseem_standardVSwikimedia':
+    elif dataSet == 'other_waseem_standardVSoffenseval':
+        # WaseemHovy
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # SemEval
         IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
         for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
             IDsTrain.append(id)
@@ -197,6 +199,13 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # Also add SemEval test-data
+        IDsStd,Xstd,Ystd = read_corpus('../../public_development_en/test_en.tsv',cls)
+        for id,x,y in zip(IDsStd,Xstd,Ystd):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Facebook
         IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
         for id,x,y in zip(IDsOther,Xother,Yother):
             IDsTrain.append(id)
@@ -208,19 +217,64 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
-        IDsTest,Xtest,Ytest = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
+        # OffensEval
+        IDsTest,Xtest,Ytest = read_corpus_offensevalTEST('../../OLIDv1.0/testset-levela.tsv',cls)
+        # Also add OffensEval train data
+        IDsOff,Xoff,Yoff = read_corpus_offensevalTRAIN('../../OLIDv1.0/olid-training-v1.0.tsv',cls)
+        for id,x,y in zip(IDsOff,Xoff,Yoff):
+            IDsTest.append(id)
+            Xtest.append(x)
+            Ytest.append(y)
+    # elif dataSet == 'other_waseem_standardVSwikimedia':
+    #     IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+    #     for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
+    #     for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     # Also add SemEval dev-data
+    #     IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+    #     for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+    #     for id,x,y in zip(IDsOther,Xother,Yother):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     # Also add Facebook dev-data
+    #     IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+    #     for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsTest,Xtest,Ytest = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
 
-    elif dataSet == 'other_waseem_wikimediaVSstandard':
+    elif dataSet == 'other_waseem_offensevalVSstandard':
+        # WaseemHovy
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
-        IDsWikimedia,Xwikimedia,Ywikimedia = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
-        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+        # OffensEval
+        IDsOfftest,Xofftest,Yofftest = read_corpus_offensevalTEST('../../OLIDv1.0/testset-levela.tsv',cls)
+        for id,x,y in zip(IDsOfftest,Xofftest,Yofftest):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # Also add OffensEval train data
+        IDsOff,Xoff,Yoff = read_corpus_offensevalTRAIN('../../OLIDv1.0/olid-training-v1.0.tsv',cls)
+        for id,x,y in zip(IDsOff,Xoff,Yoff):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Facebook
         IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
         for id,x,y in zip(IDsOther,Xother,Yother):
             IDsTrain.append(id)
@@ -232,6 +286,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # SemEval
         IDsTest,Xtest,Ytest = read_corpus('../../public_development_en/train_en.tsv',cls)
         # Also add SemEval dev-data
         IDsTest2,Xtest2,Ytest2 = read_corpus('../../public_development_en/dev_en.tsv',cls)
@@ -239,8 +294,44 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTest.append(id)
             Xtest.append(x)
             Ytest.append(y)
+        # Also add SemEval test-data
+        IDsStd,Xstd,Ystd = read_corpus('../../public_development_en/test_en.tsv',cls)
+        for id,x,y in zip(IDsStd,Xstd,Ystd):
+            IDsTest.append(id)
+            Xtest.append(x)
+            Ytest.append(y)
+    # elif dataSet == 'other_waseem_wikimediaVSstandard':
+    #     IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+    #     for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsWikimedia,Xwikimedia,Ywikimedia = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
+    #     for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+    #     for id,x,y in zip(IDsOther,Xother,Yother):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     # Also add Facebook dev-data
+    #     IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+    #     for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsTest,Xtest,Ytest = read_corpus('../../public_development_en/train_en.tsv',cls)
+    #     # Also add SemEval dev-data
+    #     IDsTest2,Xtest2,Ytest2 = read_corpus('../../public_development_en/dev_en.tsv',cls)
+    #     for id,x,y in zip(IDsTest2,Xtest2,Ytest2):
+    #         IDsTest.append(id)
+    #         Xtest.append(x)
+    #         Ytest.append(y)
 
-    elif dataSet == 'other_standard_wikimediaVSwaseem':
+    elif dataSet == 'other_standard_offensevalVSwaseem':
+        # SemEval
         IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
         for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
             IDsTrain.append(id)
@@ -252,11 +343,25 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
-        IDsWikimedia,Xwikimedia,Ywikimedia = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
-        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+        # Also add SemEval test-data
+        IDsStd,Xstd,Ystd = read_corpus('../../public_development_en/test_en.tsv',cls)
+        for id,x,y in zip(IDsStd,Xstd,Ystd):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # OffensEval
+        IDsOfftest,Xofftest,Yofftest = read_corpus_offensevalTEST('../../OLIDv1.0/testset-levela.tsv',cls)
+        for id,x,y in zip(IDsOfftest,Xofftest,Yofftest):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Also add OffensEval train data
+        IDsOff,Xoff,Yoff = read_corpus_offensevalTRAIN('../../OLIDv1.0/olid-training-v1.0.tsv',cls)
+        for id,x,y in zip(IDsOff,Xoff,Yoff):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Facebook
         IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
         for id,x,y in zip(IDsOther,Xother,Yother):
             IDsTrain.append(id)
@@ -268,14 +373,46 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # WaseemHovy
         IDsTest,Xtest,Ytest = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+    # elif dataSet == 'other_standard_wikimediaVSwaseem':
+    #     IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
+    #     for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     # Also add SemEval dev-data
+    #     IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+    #     for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsWikimedia,Xwikimedia,Ywikimedia = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
+    #     for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsOther,Xother,Yother = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+    #     for id,x,y in zip(IDsOther,Xother,Yother):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     # Also add Facebook dev-data
+    #     IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+    #     for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsTest,Xtest,Ytest = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
 
-    elif dataSet == 'waseem_standard_wikimediaVSother':
+    elif dataSet == 'waseem_standard_offensevalVSother':
+        # WaseemHovy
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # SemEval
         IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
         for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
             IDsTrain.append(id)
@@ -287,18 +424,61 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
-        IDsWikimedia,Xwikimedia,Ywikimedia = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
-        for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+        # Also add SemEval test-data
+        IDsStd,Xstd,Ystd = read_corpus('../../public_development_en/test_en.tsv',cls)
+        for id,x,y in zip(IDsStd,Xstd,Ystd):
             IDsTrain.append(id)
             Xtrain.append(x)
             Ytrain.append(y)
+        # OffensEval
+        IDsOfftest,Xofftest,Yofftest = read_corpus_offensevalTEST('../../OLIDv1.0/testset-levela.tsv',cls)
+        for id,x,y in zip(IDsOfftest,Xofftest,Yofftest):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Also add OffensEval train data
+        IDsOff,Xoff,Yoff = read_corpus_offensevalTRAIN('../../OLIDv1.0/olid-training-v1.0.tsv',cls)
+        for id,x,y in zip(IDsOff,Xoff,Yoff):
+            IDsTrain.append(id)
+            Xtrain.append(x)
+            Ytrain.append(y)
+        # Facebook
         IDsTest,Xtest,Ytest = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
         IDsTest2,Xtest2,Ytest2 = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
         for id,x,y in zip(IDsTest2,Xtest2,Ytest2):
             IDsTest.append(id)
             Xtest.append(x)
             Ytest.append(y)
+    # elif dataSet == 'waseem_standard_wikimediaVSother':
+    #     IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
+    #     for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsStandard,Xstandard,Ystandard = read_corpus('../../public_development_en/train_en.tsv',cls)
+    #     for id,x,y in zip(IDsStandard,Xstandard,Ystandard):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     # Also add SemEval dev-data
+    #     IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/dev_en.tsv',cls)
+    #     for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsWikimedia,Xwikimedia,Ywikimedia = read_corpus_wikimedia('../../4563973/toxicity_annotated_comments.tsv',cls)
+    #     for id,x,y in zip(IDsWikimedia,Xwikimedia,Ywikimedia):
+    #         IDsTrain.append(id)
+    #         Xtrain.append(x)
+    #         Ytrain.append(y)
+    #     IDsTest,Xtest,Ytest = read_corpus_otherSet('../../english/agr_en_train.csv',cls)
+    #     IDsTest2,Xtest2,Ytest2 = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+    #     for id,x,y in zip(IDsTest2,Xtest2,Ytest2):
+    #         IDsTest.append(id)
+    #         Xtest.append(x)
+    #         Ytest.append(y)
 
+###                 4vs2            ###
     elif dataSet == 'waseem_standard_wikimedia_otherVSstandardTest_otherTest':
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
         for id,x,y in zip(IDsWaseem,Xwaseem,Ywaseem):
@@ -327,6 +507,7 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
             Xtest.append(x)
             Ytest.append(y)
 
+###                 4vsSO           ###
     elif dataSet == 'waseem_standard_wikimedia_otherVSstackoverflow':
         IDsTest,Xtest,Ytest = read_corpus_stackoverflow('../../offensive.csv',cls)
         IDsWaseem,Xwaseem,Ywaseem = read_corpus_WaseemHovy('../../Full_Tweets_June2016_Dataset.csv',cls)
