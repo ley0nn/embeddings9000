@@ -67,11 +67,26 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
                 IDsTrain.append(id)
                 Xtrain.append(x)
                 Ytrain.append(y)
+            # Also add SemEval test-data
+            IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/test_en.tsv',cls)
+            for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+                IDsTrain.append(id)
+                Xtrain.append(x)
+                Ytrain.append(y)
 
         elif trainPath == '../../english/agr_en_train.csv':
             IDsTrain,Xtrain,Ytrain = read_corpus_otherSet(trainPath,cls)
             # Also add Facebook dev-data
             IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+            for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+                IDsTrain.append(id)
+                Xtrain.append(x)
+                Ytrain.append(y)
+
+        elif trainPath == '../../OLIDv1.0/olid-training-v1.0.tsv':
+            IDsTrain,Xtrain,Ytrain = read_corpus_offensevalTRAIN(trainPath,cls)
+            # Also add OffensEval test-data
+            IDsOther_test,Xother_test,Yother_test = read_corpus_offensevalTEST('../../OLIDv1.0/testset-levela.tsv' ,cls)
             for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
                 IDsTrain.append(id)
                 Xtrain.append(x)
@@ -93,11 +108,26 @@ def loaddata(dataSet, trainPath, testPath, cls, TASK, reverse):
                 IDsTest.append(id)
                 Xtest.append(x)
                 Ytest.append(y)
+            # Also add SemEval test-data
+            IDsStandard_test,Xstandard_test,Ystandard_test = read_corpus('../../public_development_en/test_en.tsv',cls)
+            for id,x,y in zip(IDsStandard_test,Xstandard_test,Ystandard_test):
+                IDsTest.append(id)
+                Xtest.append(x)
+                Ytest.append(y)
 
         elif testPath == '../../english/agr_en_train.csv':
             IDsTest,Xtest,Ytest = read_corpus_otherSet(testPath,cls)
             # Also add Facebook dev-data
             IDsOther_test,Xother_test,Yother_test = read_corpus_otherSet('../../english/agr_en_dev.csv',cls)
+            for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
+                IDsTest.append(id)
+                Xtest.append(x)
+                Ytest.append(y)
+
+        elif testPath == '../../OLIDv1.0/olid-training-v1.0.tsv':
+            IDsTest,Xtest,Ytest = read_corpus_offensevalTRAIN(testPath,cls)
+            # Also add OffensEval test-data
+            IDsOther_test,Xother_test,Yother_test = read_corpus_offensevalTEST('../../OLIDv1.0/testset-levela.tsv' ,cls)
             for id,x,y in zip(IDsOther_test,Xother_test,Yother_test):
                 IDsTest.append(id)
                 Xtest.append(x)
