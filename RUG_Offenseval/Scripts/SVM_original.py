@@ -354,7 +354,7 @@ def main(ftr, clean, path_to_embs):
         print('sourc: {} - datas: {}'.format(source, dataSet))
 
     if prob:
-        with open('probas_SVC_' + dataSet + '_' + trainPath[6:-4] + '_' + ftr + '_' + path_to_embs[17:-4] + '_concat=' + str(concat) + '.txt', 'w+') as yguess_output:
+        with open('probas_SVC_' + dataSet + '_' + trainPath.split("/")[-1] + '_' + ftr + '_' + path_to_embs.split("/")[-1] + '_concat=' + str(concat) + '.txt', 'w+') as yguess_output:
             for i in classifier.predict_proba(Xtest):
                 yguess_output.write('%s\n' % i[1])
         # print(classifier.predict_proba(Xtest))
@@ -365,10 +365,10 @@ if __name__ == '__main__':
     # main('ngram', 'none', '../../embeddings/reddit_general_ruby.txt')
 
     main('embeddings', 'ruby', '../../embeddings/reddit_general_ruby.txt')
-    # main('embeddings', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
-    # main('embeddings', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
-    # main('embeddings', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
-    #
+    main('embeddings', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
+    main('embeddings', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
+    main('embeddings', 'ruby', '../../embeddings/glove.twitter.27B.200d.txt')
+
     # main('embeddings+ngram', 'ruby', '../../embeddings/reddit_general_ruby.txt')
     # main('embeddings+ngram', 'ruby', '../../embeddings/reddit_polarised_ruby.txt')
     # main('embeddings+ngram', 'ruby', '../../embeddings/twitter_polarised_2016.txt')
